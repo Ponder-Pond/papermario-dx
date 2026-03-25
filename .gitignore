@@ -17,6 +17,8 @@ expected/
 ctx.c.m2c
 /data2c
 .nix-profile*
+/result
+/papermario-dx-windows/
 
 # Build artifacts
 build.ninja
@@ -36,7 +38,6 @@ build.ninja
 baserom.*
 build/
 !tools/build
-/docs/doxygen/
 /include/ld_addrs.h
 /include/message_ids.h
 /include/sprite/
