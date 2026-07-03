@@ -1,9 +1,6 @@
 #include "kkj_18.h"
 #include "sprite/player.h"
 
-#include "world/common/complete/KeyItemChoice.inc.c"
-#include "world/common/complete/ConsumableItemChoice.inc.c"
-
 API_CALLABLE(N(SetHeldBakingItem)) {
     Bytecode* args = script->ptrReadPos;
 
@@ -40,7 +37,7 @@ Vec3f N(TwinkDepartPath)[] = {
     {  160.0,    60.0,  -25.0 },
 };
 
-EvtScript N(EVS_ApproachPeach) = {
+EvtScript N(EVS_GetApproachPeachPos) = {
     Call(GetPlayerPos, LVar0, LVar1, LVar2)
     Add(LVar0, 16)
     Call(UseSettingsFrom, CAM_DEFAULT, LVar0, LVar1, LVar2)
@@ -297,7 +294,7 @@ EvtScript N(EVS_GourmetGuy_RunAround) = {
     Call(GetNpcPos, NPC_GourmetGuy, LVar0, LVar1, LVar2)
     Call(NpcJump0, NPC_GourmetGuy, LVar0, 200, LVar2, 15 * DT)
     Call(SetNpcAnimation, NPC_GourmetGuy, ANIM_GourmetGuy_Panic)
-    Call(SetNpcFlagBits, NPC_GourmetGuy, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_GourmetGuy, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Call(SetNpcSpeed, NPC_GourmetGuy, Float(20.0 / DT))
     Call(PlaySoundAtNpc, NPC_GourmetGuy, SOUND_GOURMET_GUY_RUN, SOUND_SPACE_DEFAULT)
     Call(SetNpcRotation, NPC_GourmetGuy, 0, 0, -45)
@@ -463,12 +460,12 @@ EvtScript N(EVS_Scene_GiveKitchenKey) = {
 
 EvtScript N(EVS_Scene_JudgeCake) = {
     Call(DisablePlayerInput, true)
-    IfEq(AB_KKJ19_AddedBerries, false)
+    IfEq(AF_KKJ19_AddedBerries, false)
         Set(MV_CakeItemIdx, ITEM_CAKE_WITH_ICING)
         Set(LVar0, ANIM_Peach3_PresentBerryCake)
         Set(LVar1, ANIM_Peach1_HoldIcingCake)
     Else
-        IfEq(AB_KKJ19_AddedIcing, false)
+        IfEq(AF_KKJ19_AddedIcing, false)
             Set(MV_CakeItemIdx, ITEM_CAKE_WITH_BERRIES)
             Set(LVar0, ANIM_Peach3_PresentIcingCake)
             Set(LVar1, ANIM_Peach1_HoldBerryCake)
@@ -495,7 +492,7 @@ EvtScript N(EVS_Scene_JudgeCake) = {
     Set(AF_KKJ_FinishedBakingCake, false)
     Call(N(SetHeldBakingItem), PEACH_BAKING_NONE)
     Thread
-        Call(DisablePartnerAI, 0)
+        Call(DisablePartnerAI, false)
         Call(NpcFlyTo, NPC_PARTNER, -23, 30, 36, 5 * DT, 0, EASING_LINEAR)
         Call(InterpNpcYaw, NPC_PARTNER, 90, 5)
     EndThread
@@ -631,7 +628,7 @@ EvtScript N(EVS_Scene_JudgeCake) = {
     Call(SpeakToNpc, NPC_Kammy, ANIM_WorldKammy_Anim05, ANIM_WorldKammy_Anim01, 0, NPC_Koopatrol_01, MSG_Peach_00B5)
     KillThread(LVarA)
     Call(DisablePlayerPhysics, true)
-    ExecWait(N(EVS_ApproachPeach))
+    ExecWait(N(EVS_GetApproachPeachPos))
     ExecWait(N(EVS_PickUpPeach))
     Call(SpeakToPlayer, NPC_PLAYER, ANIM_Peach2_Carried, ANIM_Peach2_Carried, 5, MSG_Peach_00B6)
     Thread

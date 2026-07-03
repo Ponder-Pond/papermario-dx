@@ -1,10 +1,9 @@
 #include "osr_02.h"
 
-#include "world/common/todo/GetPeachDisguise.inc.c"
 
-#include "world/common/enemy/Clubba.inc.c"
+#include "world/common/enemy/Clubba/idle.inc.c"
 
-AnimID N(ExtraAnims_Clubba)[] = {
+AnimID N(LimitAnims_Clubba)[] = {
     ANIM_WorldClubba_Anim00,
     ANIM_WorldClubba_Anim02,
     ANIM_WorldClubba_Anim03,
@@ -24,7 +23,7 @@ EvtScript N(EVS_NpcInteract_Clubba) = {
     Call(SetNpcAnimation, NPC_SELF, ANIM_WorldClubba_Anim08)
     Wait(10)
     Call(SetNpcAnimation, NPC_SELF, ANIM_WorldClubba_Anim02)
-    Call(N(GetPeachDisguise), LVar0)
+    Call(GetPeachDisguise, LVar0)
     Switch(LVar0)
         CaseEq(0)
             Set(LVar1, MSG_Peach_014A)
@@ -82,7 +81,7 @@ NpcData N(NpcData_Clubba) = {
     .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER,
     .drops = NO_DROPS,
     .animations = CLUBBA_ANIMS,
-    .extraAnimations = N(ExtraAnims_Clubba),
+    .limitAnimations = N(LimitAnims_Clubba),
 };
 
 NpcGroupList N(PeachNPCs) = {

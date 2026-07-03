@@ -1,19 +1,7 @@
 #include "iwa_04.h"
 #include "sprite/player.h"
 
-#include "world/common/enemy/Cleft.inc.c"
-
-API_CALLABLE(N(func_80241060_91C940)) {
-    gCameras[CAM_DEFAULT].yinterpAlpha = 1.0f;
-    return ApiStatus_BLOCK;
-}
-
-API_CALLABLE(N(func_8024107C_91C95C)) {
-    Bytecode* args = script->ptrReadPos;
-    Npc* npc = resolve_npc(script, NPC_SELF);
-    npc->renderYaw = (f32) evt_get_variable(script, *args++);
-    return ApiStatus_DONE2;
-}
+#include "world/common/enemy/Cleft/wander.inc.c"
 
 EvtScript N(EVS_FlapWingSounds) = {
     Loop(0)
@@ -116,7 +104,7 @@ EvtScript N(EVS_NpcAI_Buzzar) = {
         EndIf
     EndLoop
     Call(SetPlayerPos, 430, 0, -25)
-    Call(func_802CF56C, 2)
+    Call(SetPartnerFollowMode, PARTNER_FORCED_FOLLOW_ONCE)
     Call(SetNpcPos, NPC_SELF, 538, 200, -25)
     Call(EnableNpcShadow, NPC_SELF, true)
     Call(GetPlayerPos, LVar0, LVar1, LVar2)
@@ -137,7 +125,7 @@ EvtScript N(EVS_NpcAI_Buzzar) = {
         Call(SetCamSpeed, CAM_DEFAULT, Float(1.0 / DT))
         Call(PanToTarget, CAM_DEFAULT, Float(0.5), true)
         Call(WaitForCam, CAM_DEFAULT, Float(1.0))
-        Call(func_802CF56C, 2)
+        Call(SetPartnerFollowMode, PARTNER_FORCED_FOLLOW_ONCE)
     EndThread
     Call(PlayerFaceNpc, NPC_SELF, false)
     Call(SetPlayerAnimation, ANIM_Mario1_LookUp)
@@ -294,7 +282,7 @@ NpcData N(NpcData_Cleft) = {
             .detectSize = { 175, 195 },
         }
     },
-    .settings = &N(NpcSettings_Cleft),
+    .settings = &N(NpcSettings_Cleft_Wander),
     .flags = ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_FLYING,
     .drops = CLEFT_DROPS,
     .animations = CLEFT_ANIMS,
@@ -319,8 +307,8 @@ NpcData N(NpcData_Buzzar) = {
         .walk   = ANIM_Buzzar_Anim01,
         .run    = ANIM_Buzzar_Anim01,
         .chase  = ANIM_Buzzar_Anim01,
-        .anim_4 = ANIM_Buzzar_Anim01,
-        .anim_5 = ANIM_Buzzar_Anim01,
+        .alert  = ANIM_Buzzar_Anim01,
+        .unused = ANIM_Buzzar_Anim01,
         .death  = ANIM_Buzzar_Anim0B,
         .hit    = ANIM_Buzzar_Anim0B,
         .anim_8 = ANIM_Buzzar_Anim01,

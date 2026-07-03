@@ -1,7 +1,7 @@
 #include "kpa_16.h"
 
-#include "world/common/enemy/Koopatrol.h"
-#include "world/common/enemy/Magikoopa.h"
+#include "world/common/enemy/Koopatrol/base.h"
+#include "world/common/enemy/Magikoopa/base.h"
 
 API_CALLABLE(N(SetScreenBlackFadeAmount)) {
     Bytecode* args = script->ptrReadPos;
@@ -15,8 +15,6 @@ API_CALLABLE(N(MuteAmbience)) {
     snd_ambient_fade_out(0, true);
     return ApiStatus_DONE2;
 }
-
-#include "world/common/todo/GetFloorCollider.inc.c"
 
 NpcSettings N(NpcSettings_Dummy) = {
     .height = 40,
@@ -99,7 +97,7 @@ EvtScript N(EVS_Scene_LavaShutoff) = {
         EndIf
     EndLoop
     Wait(60 * DT)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(GetCurrentPartnerID, LVar0)
     Switch(LVar0)
         CaseEq(PARTNER_GOOMBARIO)
@@ -146,7 +144,7 @@ EvtScript N(EVS_ChargeAtPlayer) = {
 EvtScript N(EVS_NpcIdle_Guards) = {
     Label(0)
         Wait(1)
-        Call(N(GetFloorCollider), LVar0)
+        Call(GetPlayerFloorCollider, LVar0)
         IfNe(LVar0, COLLIDER_o785)
             Goto(0)
         EndIf
@@ -321,7 +319,7 @@ NpcData N(NpcData_Guards)[] = {
         .yaw = 270,
         .settings = &N(NpcSettings_Dummy),
         .flags = BASE_PASSIVE_FLAGS | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER | ENEMY_FLAG_NO_DROPS,
-        .drops = MAGINO_DROPS,
+        .drops = MAGIKOOPA_DROPS,
         .animations = MAGIKOOPA_ANIMS,
     },
 };

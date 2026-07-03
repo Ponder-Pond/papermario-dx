@@ -1,9 +1,7 @@
 #include "kzn_18.h"
 
-#include "world/common/npc/Kolorado.inc.c"
-#include "world/common/enemy/PutridPiranhaSentinel.inc.c"
-
-#include "world/common/todo/GetFloorCollider.inc.c"
+#include "world/common/npc/Kolorado/idle.inc.c"
+#include "world/common/enemy/PutridPiranhaSentinel/idle.inc.c"
 
 EvtScript N(EVS_NpcIdle_Kolorado) = {
     IfLt(GB_StoryProgress, STORY_CH5_KOLORADO_RAN_AHEAD)
@@ -32,7 +30,7 @@ EvtScript N(EVS_NpcIdle_Kolorado) = {
     EndIf
     Loop(0)
         Wait(1)
-        Call(N(GetFloorCollider), LVar0)
+        Call(GetPlayerFloorCollider, LVar0)
         IfEq(LVar0, COLLIDER_o442)
             BreakLoop
         EndIf
@@ -160,7 +158,7 @@ NpcData N(NpcData_Piranha) = {
     .init = &N(EVS_NpcInit_Piranha),
     .settings = &N(NpcSettings_PutridPiranhaSentinel),
     .flags = ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ACTIVE_WHILE_OFFSCREEN,
-    .drops = PIRANHA_NO_DROPS,
+    .drops = PIRANHA_SENTINEL_DROPS,
     .animations = PIRANHA_SENTINEL_ANIMS,
 };
 

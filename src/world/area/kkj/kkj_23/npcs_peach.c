@@ -3,14 +3,12 @@
 
 #include "../common/Searchlights.inc.c"
 
-#include "world/common/todo/GetPeachDisguise.inc.c"
-#include "../common/PreventNextPeachDisguise.inc.c"
-#include "../common/ApproachPlayer50Units.inc.c"
+#include "../common/GetApproachPeachPos.inc.c"
 
-#include "world/common/enemy/Kammy.inc.c"
-#include "world/common/enemy/Koopatrol_Stationary.inc.c"
+#include "world/common/enemy/Kammy/idle.inc.c"
+#include "world/common/enemy/Koopatrol/idle.inc.c"
 
-AnimID N(ExtraAnims_Koopatrol)[] = {
+AnimID N(LimitAnims_Koopatrol)[] = {
     ANIM_WorldKoopatrol_Anim00,
     ANIM_WorldKoopatrol_Anim01,
     ANIM_WorldKoopatrol_Anim02,
@@ -44,7 +42,7 @@ EvtScript N(EVS_NpcInteract_Koopatrol_01) = {
 
 EvtScript N(EVS_CapturePeach) = {
     Call(DisablePlayerInput, true)
-    Call(N(PreventNextPeachDisguise))
+    Call(PreventNextPeachDisguise)
     SetGroup(EVT_GROUP_NEVER_PAUSE)
     Call(SetTimeFreezeMode, TIME_FREEZE_PARTIAL)
     Call(PlaySoundAtNpc, NPC_SELF, SOUND_EMOTE_IDEA, SOUND_SPACE_DEFAULT)
@@ -55,7 +53,7 @@ EvtScript N(EVS_CapturePeach) = {
     Call(SetPlayerAnimation, ANIM_Peach2_Gasp)
     Call(SetNpcAnimation, NPC_SELF, ANIM_WorldKoopatrol_Anim01)
     Call(SpeakToPlayer, NPC_SELF, ANIM_WorldKoopatrol_Anim08, ANIM_WorldKoopatrol_Anim01, 0, MSG_Peach_0174)
-    Call(N(ApproachPlayer50Units), -1, LVar3, LVar0, LVar2)
+    Call(N(GetApproachPeachPos), NPC_SELF, 50, LVar3, LVar0, LVar2)
     IfNe(LVar3, 0)
         Call(SetNpcAnimation, NPC_SELF, ANIM_WorldKoopatrol_Anim06)
         Call(SetNpcSpeed, NPC_SELF, Float(5.0))
@@ -74,7 +72,7 @@ EvtScript N(EVS_CapturePeach) = {
 
 EvtScript N(EVS_Koopatrol_WatchForPeach) = {
     Loop(0)
-        Call(N(GetPeachDisguise), LVar1)
+        Call(GetPeachDisguise, LVar1)
         IfEq(LVar1, PEACH_DISGUISE_NONE)
             Call(SetSelfEnemyFlagBits, ENEMY_FLAG_CANT_INTERACT, true)
             Call(BindNpcAI, NPC_SELF, Ref(N(EVS_CapturePeach)))
@@ -122,7 +120,7 @@ EvtScript N(EVS_NpcInit_Koopatrol_02) = {
     End
 };
 
-AnimID N(ExtraAnims_Kammy)[] = {
+AnimID N(LimitAnims_Kammy)[] = {
     ANIM_WorldKammy_Anim01,
     ANIM_WorldKammy_Anim02,
     ANIM_WorldKammy_Anim04,
@@ -139,29 +137,29 @@ NpcData N(NpcData_Kammy)[] = {
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
         .drops = NO_DROPS,
         .animations = KAMMY_ANIMS,
-        .extraAnimations = N(ExtraAnims_Kammy),
+        .limitAnimations = N(LimitAnims_Kammy),
     },
     {
         .id = NPC_Koopatrol_01,
         .pos = { 0.0f, -500.0f, 0.0f },
         .yaw = 0,
         .init = &N(EVS_NpcInit_Koopatrol_01),
-        .settings = &N(NpcSettings_Koopatrol_Stationary),
+        .settings = &N(NpcSettings_Koopatrol),
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER,
         .drops = NO_DROPS,
         .animations = KOOPATROL_ANIMS,
-        .extraAnimations = N(ExtraAnims_Koopatrol),
+        .limitAnimations = N(LimitAnims_Koopatrol),
     },
     {
         .id = NPC_Koopatrol_02,
         .pos = { 0.0f, -500.0f, 0.0f },
         .yaw = 0,
         .init = &N(EVS_NpcInit_Koopatrol_02),
-        .settings = &N(NpcSettings_Koopatrol_Stationary),
+        .settings = &N(NpcSettings_Koopatrol),
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
         .drops = NO_DROPS,
         .animations = KOOPATROL_ANIMS,
-        .extraAnimations = N(ExtraAnims_Koopatrol),
+        .limitAnimations = N(LimitAnims_Koopatrol),
     },
 };
 

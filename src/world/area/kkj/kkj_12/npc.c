@@ -3,20 +3,20 @@
 
 #include "../common/Searchlights.inc.c"
 
-#include "world/common/todo/GetPeachDisguise.inc.c"
-#include "../common/PreventNextPeachDisguise.inc.c"
-#include "../common/ApproachPlayer100Units.inc.c"
+#include "../common/GetApproachPeachPos.inc.c"
 
 API_CALLABLE(N(DisableLightSource1)) {
     gSpriteShadingProfile->sources[1].flags = LIGHT_SOURCE_DISABLED;
     return ApiStatus_DONE2;
 }
 
-#include "world/common/enemy/Clubba.h"
-#include "world/common/enemy/Koopatrol_Stationary.inc.c"
-#include "world/common/npc/Dummy.inc.c"
+#include "world/common/enemy/Koopatrol/idle.inc.c"
 
-AnimID N(ExtraAnims_Koopatrol)[] = {
+// create a skinny clubba using Dummy
+#include "world/common/enemy/Clubba/base.h"
+#include "world/common/npc/Dummy/idle.inc.c"
+
+AnimID N(LimitAnims_Koopatrol)[] = {
     ANIM_WorldKoopatrol_Anim00,
     ANIM_WorldKoopatrol_Anim01,
     ANIM_WorldKoopatrol_Anim02,
@@ -32,7 +32,7 @@ AnimID N(ExtraAnims_Koopatrol)[] = {
     ANIM_LIST_END
 };
 
-AnimID N(ExtraAnims_Clubba)[] = {
+AnimID N(LimitAnims_Clubba)[] = {
     ANIM_WorldClubba_Anim00,
     ANIM_WorldClubba_Anim02,
     ANIM_WorldClubba_Anim03,
@@ -47,7 +47,7 @@ AnimID N(ExtraAnims_Clubba)[] = {
 
 EvtScript N(EVS_NpcInteract_Koopatrol_01) = {
     Call(DisablePlayerInput, true)
-    Call(N(GetPeachDisguise), LVar0)
+    Call(GetPeachDisguise, LVar0)
     IfEq(LVar0, PEACH_DISGUISE_CLUBBA)
         Call(SpeakToPlayer, NPC_SELF, ANIM_WorldKoopatrol_Anim09, ANIM_WorldKoopatrol_Anim02, 0, MSG_Peach_0143)
     Else
@@ -67,7 +67,7 @@ EvtScript N(EVS_NpcInteract_Koopatrol_01) = {
 
 EvtScript N(EVS_NpcInteract_Koopatrol_02) = {
     Call(DisablePlayerInput, true)
-    Call(N(GetPeachDisguise), LVar0)
+    Call(GetPeachDisguise, LVar0)
     IfEq(LVar0, PEACH_DISGUISE_CLUBBA)
         Call(AdjustCam, CAM_DEFAULT, Float(5.0 / DT), 0, Float(350.0), Float(15.0), Float(-7.0))
         Call(SpeakToPlayer, NPC_SELF, ANIM_WorldKoopatrol_Anim09, ANIM_WorldKoopatrol_Anim02, 0, MSG_Peach_0147)
@@ -80,7 +80,7 @@ EvtScript N(EVS_NpcInteract_Koopatrol_02) = {
                 EndIf
             EndLoop
         EndThread
-        Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+        Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
         Call(SetNpcAnimation, NPC_SELF, ANIM_WorldKoopatrol_Anim05)
         Call(SetNpcSpeed, NPC_SELF, Float(2.0 / DT))
         Call(NpcMoveTo, NPC_SELF, 1050, 0, 0)
@@ -114,7 +114,7 @@ EvtScript N(EVS_NpcInteract_Koopatrol_02) = {
 
 EvtScript N(EVS_CapturePeach) = {
     Call(DisablePlayerInput, true)
-    Call(N(PreventNextPeachDisguise))
+    Call(PreventNextPeachDisguise)
     SetGroup(EVT_GROUP_NEVER_PAUSE)
     Call(SetTimeFreezeMode, TIME_FREEZE_PARTIAL)
     Call(PlaySoundAtNpc, NPC_SELF, SOUND_EMOTE_IDEA, SOUND_SPACE_DEFAULT)
@@ -125,7 +125,7 @@ EvtScript N(EVS_CapturePeach) = {
     Call(SetPlayerAnimation, ANIM_Peach2_Gasp)
     Call(SetNpcAnimation, NPC_SELF, ANIM_WorldKoopatrol_Anim02)
     Call(SpeakToPlayer, NPC_SELF, ANIM_WorldKoopatrol_Anim09, ANIM_WorldKoopatrol_Anim02, 0, MSG_Peach_0174)
-    Call(N(ApproachPlayer100Units), NPC_SELF, LVar3, LVar0, LVar2)
+    Call(N(GetApproachPeachPos), NPC_SELF, 100, LVar3, LVar0, LVar2)
     IfNe(LVar3, 0)
         Call(SetNpcAnimation, NPC_SELF, ANIM_WorldKoopatrol_Anim07)
         Call(SetNpcSpeed, NPC_SELF, Float(5.0))
@@ -149,7 +149,7 @@ EvtScript N(EVS_NpcIdle_Koopatrol_01) = {
         Loop(0)
             Call(N(UpdateSearchlight), LVar0, 100, 90, 0, 40, MODEL_o694, 0)
             IfEq(LVar2, 0)
-                Call(N(GetPeachDisguise), LVar1)
+                Call(GetPeachDisguise, LVar1)
                 IfEq(LVar1, PEACH_DISGUISE_NONE)
                     Call(SetSelfEnemyFlagBits, ENEMY_FLAG_CANT_INTERACT, true)
                     IfNe(LVar0, 0)
@@ -166,10 +166,10 @@ EvtScript N(EVS_NpcIdle_Koopatrol_01) = {
     Call(SetNpcSpeed, NPC_SELF, Float(2.0))
     Loop(0)
         Call(NpcMoveTo, NPC_SELF, 900, 0, 0)
-        Call(N(GetAngleBetweenPoints), LVar0, 900, 0, 800, 0)
+        Call(GetAngleBetweenPoints, LVar0, 900, 0, 800, 0)
         Call(InterpNpcYaw, NPC_SELF, LVar0, 15)
         Call(NpcMoveTo, NPC_SELF, 800, 0, 0)
-        Call(N(GetAngleBetweenPoints), LVar0, 800, 0, 900, 0)
+        Call(GetAngleBetweenPoints, LVar0, 800, 0, 900, 0)
         Call(InterpNpcYaw, NPC_SELF, LVar0, 15)
     EndLoop
     Return
@@ -182,7 +182,7 @@ EvtScript N(EVS_NpcIdle_Koopatrol_02) = {
         Loop(0)
             Call(N(UpdateSearchlight), LVar0, 100, 90, 0, 40, MODEL_o695, 1)
             IfEq(LVar2, 0)
-                Call(N(GetPeachDisguise), LVar1)
+                Call(GetPeachDisguise, LVar1)
                 IfEq(LVar1, PEACH_DISGUISE_NONE)
                     Call(SetSelfEnemyFlagBits, ENEMY_FLAG_CANT_INTERACT, true)
                     IfNe(LVar0, 0)
@@ -231,22 +231,22 @@ NpcData N(NpcData_Koopatrol_01)[] = {
         .pos = { 0.0f, -500.0f, 0.0f },
         .yaw = 0,
         .init = &N(EVS_NpcInit_Koopatrol_01),
-        .settings = &N(NpcSettings_Koopatrol_Stationary),
+        .settings = &N(NpcSettings_Koopatrol),
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
         .drops = NO_DROPS,
         .animations = KOOPATROL_ANIMS,
-        .extraAnimations = N(ExtraAnims_Koopatrol),
+        .limitAnimations = N(LimitAnims_Koopatrol),
     },
     {
         .id = NPC_Koopatrol_02,
         .pos = { 0.0f, -500.0f, 0.0f },
         .yaw = 0,
         .init = &N(EVS_NpcInit_Koopatrol_02),
-        .settings = &N(NpcSettings_Koopatrol_Stationary),
+        .settings = &N(NpcSettings_Koopatrol),
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER,
         .drops = NO_DROPS,
         .animations = KOOPATROL_ANIMS,
-        .extraAnimations = N(ExtraAnims_Koopatrol),
+        .limitAnimations = N(LimitAnims_Koopatrol),
     },
     {
         .id = NPC_Clubba,
@@ -256,7 +256,7 @@ NpcData N(NpcData_Koopatrol_01)[] = {
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
         .drops = NO_DROPS,
         .animations = CLUBBA_ANIMS,
-        .extraAnimations = N(ExtraAnims_Clubba),
+        .limitAnimations = N(LimitAnims_Clubba),
     },
 };
 

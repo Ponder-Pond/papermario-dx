@@ -2,9 +2,6 @@
 #include "effects.h"
 #include "sprite/player.h"
 
-#define KNOCK_DOWN_MAP_VAR MV_Unk_0A
-#include "world/common/complete/KnockDownPlayer.inc.c"
-
 API_CALLABLE(N(SpawnStarsOrbitingKammy1)) {
     EffectInstance* effect;
 
@@ -57,11 +54,11 @@ EvtScript N(EVS_SpawnBowserStarEnergyWaves) = {
 
 EvtScript N(EVS_Scene_PeachBreaksFree) = {
     Call(DisablePlayerInput, true)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(SetPlayerAnimation, ANIM_Mario1_BeforeJump)
     Call(SetPlayerPos, 100, 0, 0)
     Call(PartnerIsFlying, LVar0)
-    IfEq(LVar0, false)
+    IfEq(LVar0, true)
         Call(SetNpcPos, NPC_PARTNER, 60, 10, 0)
     Else
         Call(SetNpcPos, NPC_PARTNER, 60, 0, 0)

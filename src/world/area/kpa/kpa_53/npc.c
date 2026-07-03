@@ -2,6 +2,9 @@
 #include "effects.h"
 #include "sprite/player.h"
 
+#include "world/common/npc/Peach/idle.inc.c"
+#include "world/common/enemy/Duplighost/disguised.inc.c"
+
 API_CALLABLE(N(UpdateFollowerPosition)) {
     PlayerStatus* playerStatus = &gPlayerStatus;
     Bytecode* args = script->ptrReadPos;
@@ -26,14 +29,6 @@ API_CALLABLE(N(UpdateFollowerPosition)) {
     evt_set_variable(script, outVar, playerStatus->targetYaw);
     return ApiStatus_DONE2;
 }
-
-#include "world/common/npc/Peach.inc.c"
-
-NpcSettings N(NpcSettings_Duplighost) = {
-    .height = 30,
-    .radius = 45,
-    .level = ACTOR_LEVEL_NONE,
-};
 
 EvtScript N(EVS_NpcAI_Duplighost_Flee) = {
     Call(GetNpcPos, NPC_SELF, LVar0, LVar1, LVar2)
@@ -384,24 +379,7 @@ NpcData N(NpcData_Imposter)[] = {
             .minCoinBonus = 1,
             .maxCoinBonus = 3,
         },
-        .animations = {
-            .idle   = ANIM_Duplighost_Anim02,
-            .walk   = ANIM_Duplighost_Anim03,
-            .run    = ANIM_Duplighost_Anim04,
-            .chase  = ANIM_Duplighost_Anim04,
-            .anim_4 = ANIM_Duplighost_Anim02,
-            .anim_5 = ANIM_Duplighost_Anim02,
-            .death  = ANIM_Duplighost_Anim0A,
-            .hit    = ANIM_Duplighost_Anim0A,
-            .anim_8 = ANIM_Duplighost_Anim02,
-            .anim_9 = ANIM_Duplighost_Anim02,
-            .anim_A = ANIM_Duplighost_Anim02,
-            .anim_B = ANIM_Duplighost_Anim02,
-            .anim_C = ANIM_Duplighost_Anim02,
-            .anim_D = ANIM_Duplighost_Anim02,
-            .anim_E = ANIM_Duplighost_Anim02,
-            .anim_F = ANIM_Duplighost_Anim02,
-        },
+        .animations = DUPLIGHOST_ANIMS,
     },
 };
 

@@ -23,7 +23,7 @@ API_CALLABLE(N(ForceDisguiseLoss)) {
     return ApiStatus_DONE2;
 }
 
-EvtScript N(EVS_ApproachPeach) = {
+EvtScript N(EVS_GetApproachPeachPos) = {
     Call(GetPlayerPos, LVar0, LVar1, LVar2)
     Call(SetCamSpeed, CAM_DEFAULT, Float(1.0))
     Call(SetPanTarget, CAM_DEFAULT, LVar0, LVar1, LVar2)
@@ -188,10 +188,10 @@ EvtScript N(EVS_Scene_KammyUnmasksPeach) = {
     EndLoop
     Call(DisablePlayerInput, true)
     Call(DisablePlayerPhysics, true)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(SetMusic, 0, SONG_KAMMY_KOOPA_THEME, 0, VOL_LEVEL_FULL)
     Call(SetNpcVar, NPC_Koopatrol_01, 1, 0)
-    Call(SetNpcFlagBits, NPC_Koopatrol_01, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_Koopatrol_01, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Call(SetNpcPos, NPC_Kammy, -50, 0, -50)
     Exec(N(EVS_OpenAndCloseTowerDoors))
     Call(SetNpcAnimation, NPC_Kammy, ANIM_WorldKammy_Anim02)
@@ -331,7 +331,7 @@ EvtScript N(EVS_Scene_KammyUnmasksPeach) = {
         EndLoop
         Call(InterpNpcYaw, NPC_PARTNER, 90, 0)
     EndThread
-    ExecWait(N(EVS_ApproachPeach))
+    ExecWait(N(EVS_GetApproachPeachPos))
     ExecWait(N(EVS_PickUpPeach))
     Call(SpeakToPlayer, NPC_PLAYER, ANIM_Peach2_Carried, ANIM_Peach2_Carried, 5, MSG_Peach_0158)
     ExecWait(N(EVS_CarryPeachAway))

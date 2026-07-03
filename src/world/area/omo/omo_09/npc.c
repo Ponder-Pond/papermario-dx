@@ -1,6 +1,6 @@
 #include "omo_09.h"
 
-#include "world/common/enemy/ShyGuy_Wander.inc.c"
+#include "world/common/enemy/ShyGuy/wander.inc.c"
 
 MobileAISettings N(AISettings_ShyGuy_Wander_NoReaction) = {
     .moveSpeed = 2.0f,
@@ -33,11 +33,11 @@ NpcSettings N(NpcSettings_ShyGuy_Wander_NoReaction) = {
     .actionFlags = 0,
 };
 
-#include "world/common/enemy/ShyGuy_Patrol.inc.c"
-#include "world/common/enemy/SpyGuy.inc.c"
-#include "world/common/enemy/Koopatrol_Stationary.inc.c"
-#include "world/common/enemy/Pokey.inc.c"
-#include "world/common/enemy/Kammy_Flying.inc.c"
+#include "world/common/enemy/ShyGuy/patrol.inc.c"
+#include "world/common/enemy/SpyGuy/wander.inc.c"
+#include "world/common/enemy/Koopatrol/idle.inc.c"
+#include "world/common/enemy/Pokey/wander.inc.c"
+#include "world/common/enemy/Kammy/flying.inc.c"
 
 EvtScript N(EVS_ShyGuy_CarryItem) = {
     Set(LVarA, LVar0) // npcID
@@ -210,7 +210,7 @@ NpcData N(NpcData_Pokey) = {
     .pos = { 1900.0f, 150.0f, -30.0f },
     .yaw = 270,
     .init = &N(EVS_NpcInit_Pokey),
-    .settings = &N(NpcSettings_Pokey),
+    .settings = &N(NpcSettings_Pokey_Wander),
     .flags = ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER,
     .drops = NO_DROPS,
     .animations = POKEY_ANIMS,
@@ -221,7 +221,7 @@ NpcData N(NpcData_Koopatrol) = {
     .pos = { 1900.0f, 150.0f, -30.0f },
     .yaw = 270,
     .init = &N(EVS_NpcInit_Koopatrol),
-    .settings = &N(NpcSettings_Koopatrol_Stationary),
+    .settings = &N(NpcSettings_Koopatrol),
     .flags = ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER,
     .drops = NO_DROPS,
     .animations = KOOPATROL_ANIMS,
@@ -342,7 +342,7 @@ NpcData N(NpcData_ShyGuy_05) = {
     .animations = RED_SHY_GUY_ANIMS,
 };
 
-AnimID N(ExtraAnims_Kammy)[] = {
+AnimID N(LimitAnims_Kammy)[] = {
     ANIM_WorldKammy_Anim0E,
     ANIM_WorldKammy_Anim0F,
     ANIM_WorldKammy_Anim10,
@@ -361,7 +361,7 @@ NpcData N(NpcData_Kammy) = {
     .flags = ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
     .drops = NO_DROPS,
     .animations = KAMMY_ANIMS,
-    .extraAnimations = N(ExtraAnims_Kammy),
+    .limitAnimations = N(LimitAnims_Kammy),
 };
 
 EvtScript N(EVS_ShyGuy_Thief) = {
@@ -423,7 +423,7 @@ NpcData N(NpcData_SpyGuy)[] = {
                 .detectSize = { 200 },
             }
         },
-        .settings = &N(NpcSettings_SpyGuy),
+        .settings = &N(NpcSettings_SpyGuy_Wander),
         .flags = ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
         .drops = SPY_GUY_DROPS,
         .animations = SPY_GUY_ANIMS,

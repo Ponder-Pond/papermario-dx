@@ -1,7 +1,7 @@
 #include "arn_13.h"
 
-#include "world/common/npc/TubbasHeart.inc.c"
-#include "world/common/enemy/HyperGoomba_Wander.inc.c"
+#include "world/common/npc/TubbasHeart/idle.inc.c"
+#include "world/common/enemy/HyperGoomba/wander.inc.c"
 
 EvtScript N(EVS_NpcIdle_TubbasHeart) = {
     Call(SetNpcAnimation, NPC_SELF, ANIM_TubbasHeart_Anim13)
@@ -88,7 +88,7 @@ NpcData N(NpcData_HyperGoomba) = {
         }
     },
     .init = &N(EVS_NpcInit_HyperGoomba),
-    .settings = &N(NpcSettings_HyperGoomba),
+    .settings = &N(NpcSettings_HyperGoomba_Wander),
     .flags = ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
     .drops = HYPER_GOOMBA_DROPS,
     .animations = HYPER_GOOMBA_ANIMS,

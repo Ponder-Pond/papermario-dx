@@ -1,13 +1,6 @@
 #include "kmr_02.h"
 #include "sprite/player.h"
 
-#define NAME_SUFFIX _6
-#include "world/common/npc/GoombaFamily_Wander.inc.c"
-#include "wander_territories.inc.c"
-#define NAME_SUFFIX
-
-#include "world/common/todo/UnkFunc42.inc.c"
-
 Vec3f N(FlightPath_KammyAppear)[] = {
     {  473.0,   150.0,  301.0 },
     {  234.0,    80.0,  200.0 },
@@ -50,11 +43,11 @@ EvtScript N(EVS_PlayKammyFlightSounds) = {
     End
 };
 
-EvtScript N(EVS_MakeNpcsFaceKammy) = {
+EvtScript N(EVS_UpdateKammyTracking) = {
     Call(GetNpcPos, NPC_Kammy, LVar0, LVar1, LVar2)
     Label(0)
         Call(GetNpcPos, NPC_Kammy, LVar3, LVar4, LVar5)
-        Call(N(UnkFunc42))
+        Call(GetAngleBetweenPoints, LVarA, LVar0, LVar2, LVar3, LVar5)
         Call(InterpNpcYaw, NPC_Kammy, LVarA, 0)
         Set(LVar0, LVar3)
         Set(LVar1, LVar4)
@@ -74,10 +67,10 @@ EvtScript N(EVS_MakeNpcsFaceKammy) = {
     End
 };
 
-EvtScript N(EVS_Scene_KammyStrikes) = {
+EvtScript N(EVS_Scene_KammyCrushesGate) = {
     Call(DisablePlayerInput, true)
-    Call(SetNpcFlagBits, NPC_Goombaria, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
-    Call(SetNpcFlagBits, NPC_Goompapa, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_Goombaria, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_Goompapa, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Call(DisablePlayerPhysics, true)
     Call(EnableNpcAI, NPC_Goombario, false)
     Call(SetNpcAnimation, NPC_Goombario, ANIM_WorldGoombario_Idle)
@@ -88,8 +81,8 @@ EvtScript N(EVS_Scene_KammyStrikes) = {
     Call(ShowMessageAtScreenPos, MSG_CH0_0059, 160, 40)
     Call(SetNpcAnimation, NPC_Kammy, ANIM_WorldKammy_Anim15)
     Thread
-        ExecGetTID(N(EVS_PlayKammyFlightSounds), MV_Unk_04)
-        ExecGetTID(N(EVS_MakeNpcsFaceKammy), MV_Unk_05)
+        ExecGetTID(N(EVS_PlayKammyFlightSounds), MV_KammySoundsTID)
+        ExecGetTID(N(EVS_UpdateKammyTracking), MV_TrackKammyTID)
         Call(LoadPath, 40 * DT, Ref(N(FlightPath_KammyAppear)), ARRAY_COUNT(N(FlightPath_KammyAppear)), EASING_LINEAR)
         Label(10)
             Call(GetNextPathPos)
@@ -145,8 +138,8 @@ EvtScript N(EVS_Scene_KammyStrikes) = {
         IfEq(LVar0, 1)
             Goto(30)
         EndIf
-    KillThread(MV_Unk_04)
-    KillThread(MV_Unk_05)
+    KillThread(MV_KammySoundsTID)
+    KillThread(MV_TrackKammyTID)
     Call(PlaySoundAtNpc, NPC_Kammy, SOUND_SKID, SOUND_SPACE_DEFAULT)
     Thread
         Call(SetNpcAnimation, NPC_Kammy, ANIM_WorldKammy_Anim10)
@@ -280,11 +273,11 @@ EvtScript N(EVS_Scene_KammyStrikes) = {
         EndLoop
     EndThread
     Call(SetNpcAnimation, NPC_Kammy, ANIM_WorldKammy_Anim15)
-    ExecGetTID(N(EVS_MakeNpcsFaceKammy), MV_Unk_05)
+    ExecGetTID(N(EVS_UpdateKammyTracking), MV_TrackKammyTID)
     Wait(40 * DT)
     Call(SpeakToPlayer, NPC_Kammy, ANIM_WorldKammy_Anim16, ANIM_WorldKammy_Anim13, 0x200, MSG_CH0_005E)
     Call(FadeOutMusic, 0, 3000 * DT)
-    ExecGetTID(N(EVS_PlayKammyFlightSounds), MV_Unk_04)
+    ExecGetTID(N(EVS_PlayKammyFlightSounds), MV_KammySoundsTID)
     Call(LoadPath, 90 * DT, Ref(N(FlightPath_KammyDepart)), ARRAY_COUNT(N(FlightPath_KammyDepart)), EASING_QUADRATIC_IN)
     Label(70)
         Call(GetNextPathPos)
@@ -293,8 +286,8 @@ EvtScript N(EVS_Scene_KammyStrikes) = {
         IfEq(LVar0, 1)
             Goto(70)
         EndIf
-    KillThread(MV_Unk_04)
-    KillThread(MV_Unk_05)
+    KillThread(MV_KammySoundsTID)
+    KillThread(MV_TrackKammyTID)
     Wait(20 * DT)
     Exec(N(EVS_SetupMusic))
     Call(SetNpcAnimation, NPC_Goompapa, ANIM_Goompapa_Angry)
@@ -337,14 +330,14 @@ EvtScript N(EVS_Scene_KammyStrikes) = {
     Call(DisablePlayerPhysics, false)
     Call(DisablePlayerInput, false)
     Call(SetNpcAnimation, NPC_Goompapa, ANIM_Goompapa_Idle)
-    Call(N(SetWanderTerritory_6), NPC_Goomama, 1)
-    Call(BindNpcAI, NPC_Goomama, Ref(N(EVS_NpcIdle_SwitchedWander_6)))
-    Call(N(SetWanderTerritory_6), NPC_Goombario, 2)
-    Call(BindNpcAI, NPC_Goombario, Ref(N(EVS_NpcIdle_SwitchedWander_6)))
-    Call(N(SetWanderTerritory_6), NPC_Goombaria, 3)
-    Call(BindNpcAI, NPC_Goombaria, Ref(N(EVS_NpcIdle_SwitchedWander_6)))
-    Call(SetNpcFlagBits, NPC_Goombaria, NPC_FLAG_IGNORE_PLAYER_COLLISION, false)
-    Call(SetNpcFlagBits, NPC_Goompapa, NPC_FLAG_IGNORE_PLAYER_COLLISION, false)
+    Call(N(SetWanderTerritory), NPC_Goomama, 1)
+    Call(BindNpcAI, NPC_Goomama, Ref(N(EVS_NpcIdle_SwitchedWander)))
+    Call(N(SetWanderTerritory), NPC_Goombario, 2)
+    Call(BindNpcAI, NPC_Goombario, Ref(N(EVS_NpcIdle_SwitchedWander)))
+    Call(N(SetWanderTerritory), NPC_Goombaria, 3)
+    Call(BindNpcAI, NPC_Goombaria, Ref(N(EVS_NpcIdle_SwitchedWander)))
+    Call(SetNpcFlagBits, NPC_Goombaria, NPC_FLAG_IGNORE_CHAR_COLLISION, false)
+    Call(SetNpcFlagBits, NPC_Goompapa, NPC_FLAG_IGNORE_CHAR_COLLISION, false)
     Return
     End
 };

@@ -5,12 +5,10 @@
 extern EvtScript N(EVS_NpcAI_Tubba_Chase);
 extern EvtScript N(EVS_NpcAI_Tubba_WakeUp);
 
-#include "world/common/npc/Yakkey.inc.c"
+#include "world/common/npc/Yakkey/idle.inc.c"
 
-#include "world/common/enemy/TubbaBlubba_Patrol.inc.c"
-#include "world/common/enemy/TubbaBlubba.inc.c"
-
-#include "world/common/todo/UnkFunc1.inc.c"
+#include "world/common/enemy/TubbaBlubba/patrol.inc.c"
+#include "world/common/enemy/TubbaBlubba/idle.inc.c"
 
 API_CALLABLE(N(UnusedChasePlayer)) {
     PlayerStatus* playerStatus = &gPlayerStatus;
@@ -333,8 +331,15 @@ EvtScript N(EVS_NpcAI_Tubba_Chase) = {
     End
 };
 
+API_CALLABLE(N(PostBattleHideWorld)) {
+    increment_status_bar_disabled();
+    set_screen_overlay_params_back(OVERLAY_SCREEN_COLOR, 255.0f);
+    return ApiStatus_DONE2;
+}
+
+// failsafe if the player somehow defeats Tubba
 EvtScript N(EVS_NpcDefeat_Tubba) = {
-    Call(N(UnkFunc1))
+    Call(N(PostBattleHideWorld))
     Call(GotoMap, Ref("dgb_01"), dgb_01_ENTRY_6)
     Wait(100)
     Return
@@ -370,7 +375,7 @@ EvtScript N(EVS_Scene_YakkeyShouts) = {
     EndLoop
     Call(DisablePlayerInput, true)
     Wait(40)
-    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Call(SetNpcPos, NPC_SELF, 845, 0, 140)
     Call(SetNpcJumpscale, NPC_SELF, Float(0.8))
     Call(NpcJump1, NPC_SELF, 845, 35, 145, 15)
@@ -441,7 +446,7 @@ EvtScript N(EVS_Scene_YakkeyShouts) = {
     Call(SetNpcAnimation, NPC_Tubba, ANIM_WorldTubba_Anim05)
     Call(SpeakToPlayer, NPC_Tubba, ANIM_WorldTubba_Anim13, ANIM_WorldTubba_Anim05, 5, MSG_CH3_00FB)
     Wait(15)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(GetCurrentPartnerID, LVar0)
     Switch(LVar0)
         CaseEq(PARTNER_GOOMBARIO)
@@ -466,7 +471,7 @@ EvtScript N(EVS_Scene_YakkeyShouts) = {
     Call(PanToTarget, CAM_DEFAULT, 0, false)
     Call(GetPlayerPos, LVar0, LVar1, LVar2)
     Call(SetNpcJumpscale, NPC_SELF, Float(1.0))
-    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Sub(LVar1, 10)
     Call(NpcJump0, NPC_SELF, LVar0, LVar1, LVar2, 10)
     Call(SetNpcPos, NPC_SELF, NPC_DISPOSE_LOCATION)
@@ -519,24 +524,7 @@ NpcData N(NpcData_Yakkey) = {
     .settings = &N(NpcSettings_Yakkey),
     .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_FLYING,
     .drops = NO_DROPS,
-    .animations = {
-        .idle   = ANIM_Yakkey_Idle,
-        .walk   = ANIM_Yakkey_Idle,
-        .run    = ANIM_Yakkey_Idle,
-        .chase  = ANIM_Yakkey_Idle,
-        .anim_4 = ANIM_Yakkey_Idle,
-        .anim_5 = ANIM_Yakkey_Idle,
-        .death  = ANIM_Yakkey_Idle,
-        .hit    = ANIM_Yakkey_Idle,
-        .anim_8 = ANIM_Yakkey_Idle,
-        .anim_9 = ANIM_Yakkey_Idle,
-        .anim_A = ANIM_Yakkey_Idle,
-        .anim_B = ANIM_Yakkey_Idle,
-        .anim_C = ANIM_Yakkey_Idle,
-        .anim_D = ANIM_Yakkey_Idle,
-        .anim_E = ANIM_Yakkey_Idle,
-        .anim_F = ANIM_Yakkey_Idle,
-    },
+    .animations = YAKKEY_ANIMS,
 };
 
 NpcGroupList N(DefaultNPCs) = {

@@ -29,7 +29,7 @@ EvtScript N(EVS_Scene_TossedBackInRoom) = {
     Call(SetMusic, 0, SONG_PEACH_CAUGHT, 0, VOL_LEVEL_FULL)
     Call(SetPlayerPos, -480, 30, -30)
     Call(SetPlayerAnimation, ANIM_Peach2_Carried)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(SetNpcPos, NPC_PARTNER, -480, 30, -30)
     Call(SetNpcPos, NPC_Koopatrol_Guard_01, -492, 0, -30)
     Call(SetNpcPos, NPC_Koopatrol_Guard_02, -460, 0, -30)
@@ -160,7 +160,7 @@ EvtScript N(EVS_Scene_TossedBackInRoom) = {
         Call(SpeakToPlayer, NPC_PARTNER, ANIM_Twink_Talk, ANIM_Twink_Idle, 0, MSG_Peach_0159)
         Call(SpeakToPlayer, NPC_PLAYER, ANIM_Peach2_ArmsCrossedTalk, ANIM_Peach2_ArmsCrossedIdle, 5, MSG_Peach_015A)
         IfLt(GB_KKJ_CaughtCount, 3)
-            IfEq(AF_KKJ_13, false)
+            IfEq(AF_KKJ14_CaughtUsingDoor, false)
                 Set(LVar0, MSG_Peach_015B)
             Else
                 Set(LVar0, MSG_Peach_015D)
@@ -173,7 +173,7 @@ EvtScript N(EVS_Scene_TossedBackInRoom) = {
         Call(SpeakToPlayer, NPC_PARTNER, ANIM_Twink_Talk, ANIM_Twink_Idle, 0, MSG_Peach_0176)
         Call(SpeakToPlayer, NPC_PLAYER, ANIM_Peach2_ArmsCrossedTalk, ANIM_Peach2_ArmsCrossedIdle, 5, MSG_Peach_0177)
         IfLt(GB_KKJ_CaughtCount, 3)
-            IfEq(AF_KKJ_13, false)
+            IfEq(AF_KKJ14_CaughtUsingDoor, false)
                 Set(LVar0, MSG_Peach_0178)
             Else
                 Set(LVar0, MSG_Peach_017A)
@@ -192,9 +192,7 @@ EvtScript N(EVS_Scene_TossedBackInRoom) = {
     End
 };
 
-#include "world/common/enemy/Koopatrol_Stationary.inc.c"
-
-AnimID N(ExtraAnims_Koopatrol)[] = {
+AnimID N(LimitAnims_Koopatrol)[] = {
     ANIM_WorldKoopatrol_Anim01,
     ANIM_WorldKoopatrol_Anim06,
     ANIM_WorldKoopatrol_Anim12,
@@ -208,21 +206,21 @@ NpcData N(NpcData_Guards)[] = {
         .id = NPC_Koopatrol_Guard_01,
         .pos = { 0.0f, -500.0f, 0.0f },
         .yaw = 0,
-        .settings = &N(NpcSettings_Koopatrol_Stationary),
+        .settings = &N(NpcSettings_Koopatrol),
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
         .drops = NO_DROPS,
         .animations = KOOPATROL_ANIMS,
-        .extraAnimations = N(ExtraAnims_Koopatrol),
+        .limitAnimations = N(LimitAnims_Koopatrol),
     },
     {
         .id = NPC_Koopatrol_Guard_02,
         .pos = { 0.0f, -500.0f, 0.0f },
         .yaw = 0,
-        .settings = &N(NpcSettings_Koopatrol_Stationary),
+        .settings = &N(NpcSettings_Koopatrol),
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
         .drops = NO_DROPS,
         .animations = KOOPATROL_ANIMS,
-        .extraAnimations = N(ExtraAnims_Koopatrol),
+        .limitAnimations = N(LimitAnims_Koopatrol),
     },
 };
 

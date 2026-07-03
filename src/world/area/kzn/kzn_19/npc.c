@@ -3,9 +3,9 @@
 #include "sprite/player.h"
 #include "include_asset.h"
 
-#include "world/common/npc/Kolorado.h"
-#include "world/common/npc/StarSpirit.h"
-#include "world/common/enemy/LavaPiranha.h"
+#include "world/common/npc/Kolorado/base.h"
+#include "world/common/npc/StarSpirit/base.h"
+#include "world/common/enemy/LavaPiranha/base.h"
 
 #include "world/common/lava_piranha/part1.inc.c"
 
@@ -15,18 +15,17 @@ INCLUDE_PAL("world/area/lava_piranha/vine.pal", kzn_19_lava_piranha_vine_pal);
 
 #include "world/common/lava_piranha/part2.inc.c"
 
-#include "world/common/complete/LetterDelivery.inc.c"
-
-s32 N(LetterList)[] = {
-    ITEM_LETTER_TO_KOLORADO,
-    ITEM_NONE
+LetterDelivery N(LetterDelivery_Kolorado) = {
+    .recipientID = NPC_Kolorado,
+    .recipientTalk = ANIM_Kolorado_Talk,
+    .recipientIdle = ANIM_Kolorado_Idle,
+    .msgGreeting = MSG_CH5_00E4,
+    .msgCancelled = MSG_CH5_00E5,
+    .msgDelivered = MSG_CH5_00E6,
+    .msgRecieved = MSG_CH5_00E7,
+    .letters = { ITEM_LETTER_TO_KOLORADO },
+    .reward = ITEM_STAR_PIECE,
 };
-
-EVT_LETTER_PROMPT(Kolorado, NPC_Kolorado, ANIM_Kolorado_Talk, ANIM_Kolorado_Idle,
-    MSG_CH5_00E4, MSG_CH5_00E5, MSG_CH5_00E6, MSG_CH5_00E7,
-    ITEM_LETTER_TO_KOLORADO, N(LetterList));
-
-EVT_LETTER_REWARD(Kolorado);
 
 EvtScript N(EVS_NpcIdle_Kolorado) = {
     IfEq(GF_KZN19_KoloradoDeadEnd, false)
@@ -64,7 +63,7 @@ EvtScript N(EVS_Kolorado_Escape) = {
         EndIf
     Call(DisablePlayerInput, true)
     Wait(60 * DT)
-    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Call(SetNpcPos, NPC_SELF, 70, 25, 60)
     Call(SetNpcAnimation, NPC_SELF, ANIM_Kolorado_Panic)
     Call(SetNpcSpeed, NPC_SELF, Float(4.0 / DT))
@@ -94,7 +93,8 @@ EvtScript N(EVS_Kolorado_Escape) = {
 EvtScript N(EVS_NpcInteract_Kolorado) = {
     Call(SpeakToPlayer, NPC_SELF, ANIM_Kolorado_TalkSad, ANIM_Kolorado_IdleSad, 0, MSG_CH5_0101)
     Call(SetSelfVar, 0, 1)
-    EVT_LETTER_CHECK(Kolorado)
+    Set(LVar0, Ref(N(LetterDelivery_Kolorado)))
+    ExecWait(EVS_TryLetterDelivery)
     Return
     End
 };
@@ -638,13 +638,13 @@ NpcData N(NpcData_Misstar) = {
     .tattle = MSG_NpcTattle_Misstar,
 };
 
-AnimID N(ExtraAnims_LavaPiranha)[] = {
+AnimID N(LimitAnims_LavaPiranha)[] = {
     ANIM_LavaPiranha_Anim03,
     ANIM_LavaPiranha_Anim0E,
     ANIM_LIST_END
 };
 
-AnimID N(ExtraAnims_LavaBud)[] = {
+AnimID N(LimitAnims_LavaBud)[] = {
     ANIM_LavaBud_Anim03,
     ANIM_LIST_END
 };
@@ -659,7 +659,7 @@ NpcData N(NpcData_LavaPiranha)[] = {
         .flags = ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_FLYING | ENEMY_FLAG_NO_DELAY_AFTER_FLEE,
         .drops = LAVA_PIRANHA_DROPS,
         .animations = LAVA_PIRANHA_HEAD_ANIMS,
-        .extraAnimations = N(ExtraAnims_LavaPiranha),
+        .limitAnimations = N(LimitAnims_LavaPiranha),
         .aiDetectFlags = AI_DETECT_MOTION_SENSITIVE,
     },
     {
@@ -671,7 +671,7 @@ NpcData N(NpcData_LavaPiranha)[] = {
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_NO_DELAY_AFTER_FLEE,
         .drops = LAVA_PIRANHA_DROPS,
         .animations = LAVA_PIRANHA_BUD_ANIMS,
-        .extraAnimations = N(ExtraAnims_LavaBud),
+        .limitAnimations = N(LimitAnims_LavaBud),
         .aiDetectFlags = AI_DETECT_MOTION_SENSITIVE,
     },
     {
@@ -683,7 +683,7 @@ NpcData N(NpcData_LavaPiranha)[] = {
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_NO_DELAY_AFTER_FLEE,
         .drops = LAVA_PIRANHA_DROPS,
         .animations = LAVA_PIRANHA_BUD_ANIMS,
-        .extraAnimations = N(ExtraAnims_LavaBud),
+        .limitAnimations = N(LimitAnims_LavaBud),
         .aiDetectFlags = AI_DETECT_MOTION_SENSITIVE,
     },
 };

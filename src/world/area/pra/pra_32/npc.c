@@ -2,8 +2,8 @@
 #include "effects.h"
 #include "sprite/player.h"
 
-#include "world/common/enemy/CrystalKing.inc.c"
-#include "world/common/npc/StarSpirit.inc.c"
+#include "world/common/enemy/CrystalKing/idle.inc.c"
+#include "world/common/npc/StarSpirit/idle.inc.c"
 
 EvtScript N(EVS_AnimateCam_CrystalKing) = {
     Set(MV_CamDistance, 400)
@@ -64,9 +64,9 @@ EvtScript N(EVS_Scene_CrystalKingAppears) = {
     Wait(30 * DT)
     Call(SetPlayerAnimation, ANIM_Mario1_BeforeJump)
     Call(SetPlayerPos, 475, 100, 116)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(PartnerIsFlying, LVar4)
-    IfEq(LVar4, false)
+    IfEq(LVar4, true)
         Call(SetNpcPos, NPC_PARTNER, 452, 116, 120)
     Else
         Call(SetNpcPos, NPC_PARTNER, 452, 100, 120)
@@ -134,7 +134,7 @@ EvtScript N(EVS_Scene_BossDefeated) = {
     EndThread
     Call(SetEncounterStatusFlags, ENCOUNTER_FLAG_THUMBS_UP, true)
     Call(SetPlayerPos, 475, 100, 116)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(GetNpcPos, NPC_CrystalKing_01, LVar0, LVar1, LVar2)
     Call(UseSettingsFrom, CAM_DEFAULT, LVar0, LVar1, LVar2)
     Call(SetPanTarget, CAM_DEFAULT, LVar0, LVar1, LVar2)
@@ -220,7 +220,7 @@ EvtScript N(EVS_NpcInit_CrystalKing) = {
             Exec(N(EVS_RespawnStarCard))
         CaseGt(STORY_CH7_DEFEATED_CRYSTAL_KING)
     EndSwitch
-    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_INVISIBLE | NPC_FLAG_IGNORE_PLAYER_COLLISION | NPC_FLAG_USE_INSPECT_ICON, true)
+    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_INVISIBLE | NPC_FLAG_IGNORE_CHAR_COLLISION | NPC_FLAG_USE_INSPECT_ICON, true)
     Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_HAS_SHADOW, false)
     Call(SetNpcYaw, NPC_CrystalKing_01, 270)
     Return

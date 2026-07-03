@@ -1,16 +1,7 @@
 #include "kkj_25.h"
 #include "sprite/player.h"
 
-#define NAME_SUFFIX _Npc1
-
-#include "world/common/npc/Bowser.inc.c"
-#include "world/common/npc/Dummy.inc.c"
-#include "world/common/enemy/Kammy_Flying.inc.c"
-
-#include "world/common/npc/Peach.h"
-#include "world/common/npc/Twink.h"
-
-EvtScript N(EVS_NpcIdle_Bowser) = {
+EvtScript N(EVS_NpcIdle_Bowser_Npc1) = {
     Call(SetSelfVar, 0, 0)
     Loop(0)
         Call(GetSelfVar, 0, LVar0)
@@ -36,24 +27,20 @@ EvtScript N(EVS_NpcIdle_Bowser) = {
     End
 };
 
-EvtScript N(EVS_NpcDefeat_Bowser) = {
-    #define NAME_SUFFIX
-    Call(PlaySound, SOUND_LRAW_KPA_ARENA_ACTIVE)
+EvtScript N(EVS_NpcDefeat_Bowser_Npc1) = {    Call(PlaySound, SOUND_LRAW_KPA_ARENA_ACTIVE)
     Exec(N(EVS_Scene_PeachBreaksFree))
     Return
-    End
-    #define NAME_SUFFIX _Npc1
-};
+    End};
 
-EvtScript N(EVS_NpcInit_Bowser) = {
-    Call(BindNpcIdle, NPC_SELF, Ref(N(EVS_NpcIdle_Bowser)))
-    Call(BindNpcDefeat, NPC_SELF, Ref(N(EVS_NpcDefeat_Bowser)))
+EvtScript N(EVS_NpcInit_Bowser_Npc1) = {
+    Call(BindNpcIdle, NPC_SELF, Ref(N(EVS_NpcIdle_Bowser_Npc1)))
+    Call(BindNpcDefeat, NPC_SELF, Ref(N(EVS_NpcDefeat_Bowser_Npc1)))
     Call(SetNpcPos, NPC_Bowser_01, 350, 0, 0)
     Return
     End
 };
 
-EvtScript N(EVS_NpcIdle_Kammy_Broom) = {
+EvtScript N(EVS_NpcIdle_Kammy_Broom_Npc1) = {
     Call(SetSelfVar, 0, 0)
     Loop(0)
         Call(GetSelfVar, 0, LVar0)
@@ -62,10 +49,10 @@ EvtScript N(EVS_NpcIdle_Kammy_Broom) = {
         EndIf
         Wait(1)
     EndLoop
-    Call(SetPlayerImgFXFlags, IMGFX_FLAG_2000)
+    Call(SetPlayerImgFXFlags, IMGFX_FLAG_USE_LIGHTING)
     Call(UpdatePlayerImgFX, ANIM_Mario1_Idle, IMGFX_SET_TINT, 0, 0, 0, 0)
     Call(HidePlayerShadow, true)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Wait(1)
     Call(GetNpcPos, NPC_Peach_01, LVar0, LVar1, LVar2)
     Call(SetPlayerPos, LVar0, LVar1, LVar2)
@@ -77,16 +64,16 @@ EvtScript N(EVS_NpcIdle_Kammy_Broom) = {
     End
 };
 
-API_CALLABLE(N(func_80240020_B06A20)) {
+API_CALLABLE(N(PostBattleHideWorld_Npc1)) {
     increment_status_bar_disabled();
     set_screen_overlay_params_back(OVERLAY_SCREEN_COLOR, 255.0f);
 
     return ApiStatus_DONE2;
 }
 
-EvtScript N(EVS_NpcDefeat_Kammy_Broom) = {
+EvtScript N(EVS_NpcDefeat_Kammy_Broom_Npc1) = {
     Call(GetBattleOutcome, LVar0)
-    Call(N(func_80240020_B06A20))
+    Call(N(PostBattleHideWorld_Npc1))
     Set(GF_KKJ25_Defeated_Kammy, true)
     // reload the map in the 'midpoint' configuration
     Call(GotoMap, Ref("kkj_25"), kkj_25_ENTRY_1)
@@ -95,7 +82,7 @@ EvtScript N(EVS_NpcDefeat_Kammy_Broom) = {
     End
 };
 
-EvtScript N(EVS_NpcAux_Kammy_Broom) = {
+EvtScript N(EVS_NpcAux_Kammy_Broom_Npc1) = {
     Set(LVar3, 1)
     Loop(0)
         Loop(5)
@@ -111,10 +98,10 @@ EvtScript N(EVS_NpcAux_Kammy_Broom) = {
     End
 };
 
-EvtScript N(EVS_NpcInit_Kammy_Broom) = {
-    Call(BindNpcIdle, NPC_SELF, Ref(N(EVS_NpcIdle_Kammy_Broom)))
-    Call(BindNpcDefeat, NPC_SELF, Ref(N(EVS_NpcDefeat_Kammy_Broom)))
-    Call(BindNpcAux, NPC_SELF, Ref(N(EVS_NpcAux_Kammy_Broom)))
+EvtScript N(EVS_NpcInit_Kammy_Broom_Npc1) = {
+    Call(BindNpcIdle, NPC_SELF, Ref(N(EVS_NpcIdle_Kammy_Broom_Npc1)))
+    Call(BindNpcDefeat, NPC_SELF, Ref(N(EVS_NpcDefeat_Kammy_Broom_Npc1)))
+    Call(BindNpcAux, NPC_SELF, Ref(N(EVS_NpcAux_Kammy_Broom_Npc1)))
     Call(SetNpcPos, NPC_Kammy_01, 460, 10, 0)
     Call(SetNpcYaw, NPC_Kammy_01, 270)
     Call(SetNpcAnimation, NPC_Kammy_01, ANIM_BattleKammy_Anim04)
@@ -122,14 +109,14 @@ EvtScript N(EVS_NpcInit_Kammy_Broom) = {
     End
 };
 
-EvtScript N(EVS_NpcInit_Kammy) = {
+EvtScript N(EVS_NpcInit_Kammy_Npc1) = {
     Call(SetNpcPos, NPC_Kammy_02, 300, -100, 0)
     Call(SetNpcAnimation, NPC_Kammy_02, ANIM_BattleKammy_Anim02)
     Return
     End
 };
 
-EvtScript N(EVS_NpcInit_BattleKooper_01) = {
+EvtScript N(EVS_NpcInit_BattleKooper_01_Npc1) = {
     Call(SetNpcPos, NPC_Peach_01, 400, 0, -30)
     Call(SetNpcYaw, NPC_Peach_01, 270)
     Call(SetNpcAnimation, NPC_Peach_01, ANIM_Peach2_TiedIdle)
@@ -137,7 +124,7 @@ EvtScript N(EVS_NpcInit_BattleKooper_01) = {
     End
 };
 
-EvtScript N(EVS_NpcInit_Twink) = {
+EvtScript N(EVS_NpcInit_Twink_Npc1) = {
     Call(SetNpcAnimation, NPC_Twink_01, ANIM_Twink_Idle)
     Call(EnableNpcShadow, NPC_Twink_01, false)
     Call(SetNpcPos, NPC_Twink_01, 300, -100, 0)
@@ -145,7 +132,7 @@ EvtScript N(EVS_NpcInit_Twink) = {
     End
 };
 
-AnimID N(ExtraAnims_Bowser)[] = {
+AnimID N(LimitAnims_Bowser_Npc1)[] = {
     ANIM_WorldBowser_Idle,
     ANIM_WorldBowser_Walk,
     ANIM_WorldBowser_Talk,
@@ -157,7 +144,7 @@ AnimID N(ExtraAnims_Bowser)[] = {
     ANIM_LIST_END
 };
 
-AnimID N(ExtraAnims_Peach)[] = {
+AnimID N(LimitAnims_Peach_Npc1)[] = {
     ANIM_Peach2_TiedStill,
     ANIM_Peach1_Idle,
     ANIM_Peach1_Walk,
@@ -172,7 +159,7 @@ AnimID N(ExtraAnims_Peach)[] = {
     ANIM_LIST_END
 };
 
-AnimID N(ExtraAnims_Kammy)[] = {
+AnimID N(LimitAnims_Kammy_Npc1)[] = {
     ANIM_BattleKammy_Anim00,
     ANIM_BattleKammy_Anim01,
     ANIM_BattleKammy_Anim04,
@@ -185,7 +172,7 @@ AnimID N(ExtraAnims_Kammy)[] = {
     ANIM_LIST_END
 };
 
-AnimID N(ExtraAnims_Twink)[] = {
+AnimID N(LimitAnims_Twink_Npc1)[] = {
     ANIM_Twink_Idle,
     ANIM_Twink_Sad,
     ANIM_Twink_Back,
@@ -193,36 +180,36 @@ AnimID N(ExtraAnims_Twink)[] = {
     ANIM_LIST_END
 };
 
-NpcData N(NpcData_Bowser) = {
+NpcData N(NpcData_Bowser_Npc1) = {
     .id = NPC_Bowser_01,
     .pos = { 0.0f, 0.0f, 0.0f },
     .yaw = 270,
-    .init = &N(EVS_NpcInit_Bowser),
+    .init = &N(EVS_NpcInit_Bowser_Npc1),
     .settings = &N(NpcSettings_Bowser),
     .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_NO_DROPS,
     .drops = NO_DROPS,
     .animations = BOWSER_ANIMS,
-    .extraAnimations = N(ExtraAnims_Bowser),
+    .limitAnimations = N(LimitAnims_Bowser_Npc1),
 };
 
-NpcData N(NpcData_Peach) = {
+NpcData N(NpcData_Peach_Npc1) = {
     .id = NPC_Peach_01,
     .pos = { 0.0f, 0.0f, 0.0f },
     .yaw = 270,
-    .init = &N(EVS_NpcInit_BattleKooper_01),
+    .init = &N(EVS_NpcInit_BattleKooper_01_Npc1),
     .settings = &N(NpcSettings_Dummy),
     .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_USE_PLAYER_SPRITE,
     .drops = NO_DROPS,
     .animations = PEACH_ANIMS,
-    .extraAnimations = N(ExtraAnims_Peach),
+    .limitAnimations = N(LimitAnims_Peach_Npc1),
 };
 
-NpcData N(NpcData_Kammy)[] = {
+NpcData N(NpcData_Kammy_Npc1)[] = {
     {
         .id = NPC_Kammy_01,
         .pos = { 0.0f, 0.0f, 0.0f },
         .yaw = 270,
-        .init = &N(EVS_NpcInit_Kammy_Broom),
+        .init = &N(EVS_NpcInit_Kammy_Broom_Npc1),
         .settings = &N(NpcSettings_Kammy_Flying),
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_NO_DROPS,
         .drops = NO_DROPS,
@@ -231,8 +218,8 @@ NpcData N(NpcData_Kammy)[] = {
             .walk   = ANIM_BattleKammy_Anim00,
             .run    = ANIM_BattleKammy_Anim00,
             .chase  = ANIM_BattleKammy_Anim00,
-            .anim_4 = ANIM_BattleKammy_Anim00,
-            .anim_5 = ANIM_BattleKammy_Anim00,
+            .alert  = ANIM_BattleKammy_Anim00,
+            .unused = ANIM_BattleKammy_Anim00,
             .death  = ANIM_BattleKammy_Anim00,
             .hit    = ANIM_BattleKammy_Anim00,
             .anim_8 = ANIM_BattleKammy_Anim00,
@@ -244,13 +231,13 @@ NpcData N(NpcData_Kammy)[] = {
             .anim_E = ANIM_BattleKammy_Anim00,
             .anim_F = ANIM_BattleKammy_Anim00,
         },
-        .extraAnimations = N(ExtraAnims_Kammy),
+        .limitAnimations = N(LimitAnims_Kammy_Npc1),
     },
     {
         .id = NPC_Kammy_02,
         .pos = { 0.0f, 0.0f, 0.0f },
         .yaw = 270,
-        .init = &N(EVS_NpcInit_Kammy),
+        .init = &N(EVS_NpcInit_Kammy_Npc1),
         .settings = &N(NpcSettings_Kammy_Flying),
         .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_NO_DROPS,
         .drops = NO_DROPS,
@@ -259,8 +246,8 @@ NpcData N(NpcData_Kammy)[] = {
             .walk   = ANIM_BattleKammy_Anim00,
             .run    = ANIM_BattleKammy_Anim00,
             .chase  = ANIM_BattleKammy_Anim00,
-            .anim_4 = ANIM_BattleKammy_Anim00,
-            .anim_5 = ANIM_BattleKammy_Anim00,
+            .alert  = ANIM_BattleKammy_Anim00,
+            .unused = ANIM_BattleKammy_Anim00,
             .death  = ANIM_BattleKammy_Anim00,
             .hit    = ANIM_BattleKammy_Anim00,
             .anim_8 = ANIM_BattleKammy_Anim00,
@@ -272,23 +259,21 @@ NpcData N(NpcData_Kammy)[] = {
             .anim_E = ANIM_BattleKammy_Anim00,
             .anim_F = ANIM_BattleKammy_Anim00,
         },
-        .extraAnimations = N(ExtraAnims_Kammy),
+        .limitAnimations = N(LimitAnims_Kammy_Npc1),
     },
 };
 
-NpcData N(NpcData_Twink) = {
+NpcData N(NpcData_Twink_Npc1) = {
     .id = NPC_Twink_01,
     .pos = { 0.0f, 0.0f, 0.0f },
     .yaw = 270,
-    .init = &N(EVS_NpcInit_Twink),
+    .init = &N(EVS_NpcInit_Twink_Npc1),
     .settings = &N(NpcSettings_Dummy),
     .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_NO_DROPS,
     .drops = NO_DROPS,
     .animations = TWINK_ANIMS,
-    .extraAnimations = N(ExtraAnims_Twink),
+    .limitAnimations = N(LimitAnims_Twink_Npc1),
 };
-
-#define NAME_SUFFIX
 
 NpcGroupList N(InitialNpcs) = {
     NPC_GROUP(N(NpcData_Bowser_Npc1), BTL_KPA2_FORMATION_03),

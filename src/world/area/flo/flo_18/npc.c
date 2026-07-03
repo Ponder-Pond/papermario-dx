@@ -1,26 +1,8 @@
 #include "flo_18.h"
 #include "sprite/player.h"
 
-#include "world/common/todo/UnkFunc42.inc.c"
-
-#include "world/common/enemy/Lakitu.h"
-#include "world/common/enemy/YMagikoopa.h"
-
-NpcSettings N(NpcSettings_Lakitu) = {
-    .height = 32,
-    .radius = 24,
-    .level = ACTOR_LEVEL_LAKITU,
-    .onHit = &EnemyNpcHit,
-    .onDefeat = &EnemyNpcDefeat,
-};
-
-NpcSettings N(NpcSettings_Magikoopa) = {
-    .height = 34,
-    .radius = 24,
-    .level = ACTOR_LEVEL_MAGIKOOPA,
-    .onHit = &EnemyNpcHit,
-    .onDefeat = &EnemyNpcDefeat,
-};
+#include "world/common/enemy/Lakitu/idle.inc.c"
+#include "world/common/enemy/YMagikoopa/idle.inc.c"
 
 Vec3f N(RetreatPath_Magikoopa)[] = {
     {  -55.0,    15.0,   35.0 },
@@ -56,7 +38,7 @@ Vec3f N(RetreatPath_Lakitu_03)[] = {
 
 EvtScript N(EVS_Scene_LakilesterLikesBeingGood) = {
     Call(DisablePlayerInput, true)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(SetPlayerPos, 30, 0, 50)
     Call(InterpPlayerYaw, 90, 0)
     Call(SetNpcPos, NPC_PARTNER, 65, 0, 50)
@@ -90,7 +72,7 @@ EvtScript N(EVS_Scene_LakilesterLikesBeingGood) = {
 EvtScript N(EVS_GangRetreat) = {
     Thread
         Call(PlaySoundAtNpc, NPC_FlyingMagikoopa, SOUND_FLO_MAGIKOOPA_FLY_AWAY, SOUND_SPACE_DEFAULT)
-        Call(SetNpcFlagBits, NPC_FlyingMagikoopa, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+        Call(SetNpcFlagBits, NPC_FlyingMagikoopa, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
         Call(InterpNpcYaw, NPC_FlyingMagikoopa, 270, 0)
         Call(LoadPath, 60 * DT, Ref(N(RetreatPath_Magikoopa)), ARRAY_COUNT(N(RetreatPath_Magikoopa)), EASING_LINEAR)
         Loop(0)
@@ -105,7 +87,7 @@ EvtScript N(EVS_GangRetreat) = {
     Wait(15 * DT)
     Thread
         Call(PlaySoundAtNpc, NPC_Lakitu_01, SOUND_FLO_LAKITU_FLY_AWAY, SOUND_SPACE_DEFAULT)
-        Call(SetNpcFlagBits, NPC_Lakitu_01, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+        Call(SetNpcFlagBits, NPC_Lakitu_01, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
         Call(InterpNpcYaw, NPC_Lakitu_01, 270, 0)
         Call(LoadPath, 60 * DT, Ref(N(RetreatPath_Lakitu_01)), ARRAY_COUNT(N(RetreatPath_Lakitu_01)), EASING_LINEAR)
         Loop(0)
@@ -118,7 +100,7 @@ EvtScript N(EVS_GangRetreat) = {
         EndLoop
     EndThread
     Thread
-        Call(SetNpcFlagBits, NPC_Lakitu_02, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+        Call(SetNpcFlagBits, NPC_Lakitu_02, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
         Call(InterpNpcYaw, NPC_Lakitu_02, 270, 0)
         Call(LoadPath, 70 * DT, Ref(N(RetreatPath_Lakitu_02)), ARRAY_COUNT(N(RetreatPath_Lakitu_02)), EASING_LINEAR)
         Loop(0)
@@ -131,7 +113,7 @@ EvtScript N(EVS_GangRetreat) = {
         EndLoop
     EndThread
     Call(PlaySoundAtNpc, NPC_Lakitu_03, SOUND_FLO_LAKITU_FLY_AWAY, SOUND_SPACE_DEFAULT)
-    Call(SetNpcFlagBits, NPC_Lakitu_03, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_Lakitu_03, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Call(InterpNpcYaw, NPC_Lakitu_03, 270, 0)
     Call(LoadPath, 80 * DT, Ref(N(RetreatPath_Lakitu_03)), ARRAY_COUNT(N(RetreatPath_Lakitu_03)), EASING_LINEAR)
     Loop(0)
@@ -159,15 +141,15 @@ EvtScript N(EVS_ChargeAtPlayer) = {
     Call(GetPlayerPos, LVar0, LVar1, LVar2)
     IfGt(LVar2, -61)
         ChildThread
-            Call(SetNpcFlagBits, NPC_Lakitu_01, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+            Call(SetNpcFlagBits, NPC_Lakitu_01, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
             Call(NpcMoveTo, NPC_Lakitu_01, LVar0, 55, LVar3)
         EndChildThread
         ChildThread
-            Call(SetNpcFlagBits, NPC_Lakitu_02, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+            Call(SetNpcFlagBits, NPC_Lakitu_02, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
             Call(NpcMoveTo, NPC_Lakitu_02, LVar0, 55, LVar3)
         EndChildThread
         ChildThread
-            Call(SetNpcFlagBits, NPC_Lakitu_03, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+            Call(SetNpcFlagBits, NPC_Lakitu_03, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
             Call(NpcMoveTo, NPC_Lakitu_03, LVar0, 55, LVar3)
         EndChildThread
         Wait(LVar4)
@@ -178,7 +160,7 @@ EvtScript N(EVS_ChargeAtPlayer) = {
 
 EvtScript N(EVS_Scene_GangDefeated) = {
     Call(DisablePlayerInput, true)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(GetNpcPos, NPC_PARTNER, LVar0, LVar1, LVar2)
     Call(SetNpcPos, NPC_PARTNER, 65, LVar1, 80)
     Call(SetNpcYaw, NPC_PARTNER, 270)
@@ -199,7 +181,7 @@ EvtScript N(EVS_Scene_GangDefeated) = {
         Call(NpcJump0, NPC_PARTNER, LVar1, LVar2, LVar3, 30 * DT)
     EndIf
     Call(NpcFacePlayer, NPC_PARTNER, 0)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(SpeakToPlayer, NPC_PARTNER, ANIM_WorldLakilester_Talk, ANIM_WorldLakilester_Idle, 5, MSG_CH6_00C1)
     Call(EnablePartnerAI)
     Wait(20 * DT)
@@ -221,7 +203,7 @@ EvtScript N(EVS_Scene_GangDefeated) = {
     EndIf
     Call(PlayerFaceNpc, NPC_PARTNER, false)
     Call(NpcFacePlayer, NPC_PARTNER, 0)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(SpeakToPlayer, NPC_PARTNER, ANIM_WorldLakilester_Talk, ANIM_WorldLakilester_Idle, 5, MSG_CH6_00C2)
     Call(EnablePartnerAI)
     Call(PutPartnerAway)
@@ -338,8 +320,8 @@ EvtScript N(EVS_GenericHitReaction) = {
         Return
     EndIf
     Call(DisablePlayerInput, true)
-    Call(func_802D2C14, 1)
-    Call(SetNpcFlagBits, NPC_PARTNER, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetPartnerForcedFollowMode, 1)
+    Call(SetNpcFlagBits, NPC_PARTNER, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Call(AdjustCam, CAM_DEFAULT, Float(8.0 / DT), 0, 300, Float(17.0), Float(-6.0))
     ExecWait(N(EVS_ReactionFacePlayer))
     Switch(AB_FLO_GuardedMachineHitCount)
@@ -350,7 +332,7 @@ EvtScript N(EVS_GenericHitReaction) = {
         CaseEq(1)
             ExecWait(N(EVS_SecondReactionDialogue))
     EndSwitch
-    Call(func_802D2C14, 0)
+    Call(SetPartnerForcedFollowMode, 0)
     Call(DisablePlayerInput, false)
     Return
     End
@@ -637,10 +619,10 @@ NpcData N(NpcData_MachineGang)[] = {
         .pos = { -60.0f, 0.0f, 50.0f },
         .yaw = 90,
         .init = &N(EVS_NpcInit_Magikoopa),
-        .settings = &N(NpcSettings_Magikoopa),
+        .settings = &N(NpcSettings_YMagikoopa),
         .flags = BASE_PASSIVE_FLAGS | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER,
-        .drops = MAGINO_DROPS,
-        .animations = MAGIKOOPA_YELLOW_ANIMS,
+        .drops = YELLOW_MAGIKOOPA_DROPS,
+        .animations = YELLOW_MAGIKOOPA_ANIMS,
         .tattle = MSG_NpcTattle_PuffPuffOperator,
     },
     {
@@ -648,10 +630,10 @@ NpcData N(NpcData_MachineGang)[] = {
         .pos = { NPC_DISPOSE_LOCATION },
         .yaw = 270,
         .init = &N(EVS_NpcInit_FlyingMagikoopa),
-        .settings = &N(NpcSettings_Magikoopa),
+        .settings = &N(NpcSettings_YMagikoopa),
         .flags = BASE_PASSIVE_FLAGS | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER,
-        .drops = MAGINO_DROPS,
-        .animations = FLYING_MAGIKOOPA_YELLOW_ANIMS,
+        .drops = YELLOW_MAGIKOOPA_DROPS,
+        .animations = FLYING_YELLOW_MAGIKOOPA_ANIMS,
         .tattle = MSG_NpcTattle_PuffPuffOperator,
     },
 };

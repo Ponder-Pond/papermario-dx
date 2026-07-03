@@ -1,15 +1,15 @@
 #include "dgb_08.h"
 
-#include "world/common/npc/Yakkey.inc.c"
+#include "world/common/npc/Yakkey/idle.inc.c"
 
-#include "world/common/enemy/TubbaBlubba_Patrol.inc.c"
-#include "world/common/enemy/TubbaBlubba.inc.c"
+#include "world/common/enemy/TubbaBlubba/patrol.inc.c"
+#include "world/common/enemy/TubbaBlubba/idle.inc.c"
 
-#include "world/common/enemy/Clubba_Wander.inc.c"
+#include "world/common/enemy/Clubba/wander.inc.c"
 
 #define AI_SENTINEL_FIRST_NPC NPC_Sentinel_01
 #define AI_SENTINEL_LAST_NPC  NPC_Sentinel_02
-#include "world/common/enemy/Sentinel.inc.c"
+#include "world/common/enemy/Sentinel/wander.inc.c"
 
 NpcSettings N(NpcSettings_LastClubba) = {
     .height = 24,
@@ -63,8 +63,6 @@ EvtScript N(EVS_NpcIdle_Tubba) = {
     Return
     End
 };
-
-#include "world/common/todo/UnkFunc1.inc.c"
 
 API_CALLABLE(N(SetTubbaPatrolTerritory)) {
     if (get_enemy_safe(NPC_Tubba)) {
@@ -122,8 +120,15 @@ EvtScript N(EVS_NpcAI_Tubba) = {
     End
 };
 
+API_CALLABLE(N(PostBattleHideWorld)) {
+    increment_status_bar_disabled();
+    set_screen_overlay_params_back(OVERLAY_SCREEN_COLOR, 255.0f);
+    return ApiStatus_DONE2;
+}
+
+// failsafe if the player somehow defeats Tubba
 EvtScript N(EVS_NpcDefeat_Tubba) = {
-    Call(N(UnkFunc1))
+    Call(N(PostBattleHideWorld))
     Call(GotoMap, Ref("dgb_01"), dgb_01_ENTRY_2)
     Wait(100)
     Return
@@ -220,7 +225,7 @@ NpcData N(NpcData_Clubba_01)[] = {
         .flags = ENEMY_FLAG_IGNORE_ENTITY_COLLISION,
         .drops = CLUBBA_DROPS,
         .animations = CLUBBA_ANIMS,
-        .extraAnimations = N(ExtraAnims_Clubba),
+        .limitAnimations = N(LimitAnims_Clubba),
         .aiDetectFlags = AI_DETECT_MOTION_SENSITIVE,
     },
     CLUBBA_MACE_HITBOX(NPC_Clubba_01_Hitbox),
@@ -247,7 +252,7 @@ NpcData N(NpcData_Clubba_02)[] = {
         .flags = ENEMY_FLAG_IGNORE_ENTITY_COLLISION,
         .drops = CLUBBA_DROPS,
         .animations = CLUBBA_ANIMS,
-        .extraAnimations = N(ExtraAnims_Clubba),
+        .limitAnimations = N(LimitAnims_Clubba),
         .aiDetectFlags = AI_DETECT_MOTION_SENSITIVE,
     },
     CLUBBA_MACE_HITBOX(NPC_Clubba_02_Hitbox),
@@ -274,7 +279,7 @@ NpcData N(NpcData_Clubba_03)[] = {
         .flags = ENEMY_FLAG_IGNORE_ENTITY_COLLISION,
         .drops = CLUBBA_DROPS,
         .animations = CLUBBA_ANIMS,
-        .extraAnimations = N(ExtraAnims_Clubba),
+        .limitAnimations = N(LimitAnims_Clubba),
         .aiDetectFlags = AI_DETECT_SIGHT | AI_DETECT_MOTION_SENSITIVE,
     },
     CLUBBA_MACE_HITBOX(NPC_Clubba_03_Hitbox),
@@ -296,7 +301,7 @@ NpcData N(NpcData_Sentinel_01) = {
             .detectSize = { 250, 55 },
         }
     },
-    .settings = &N(NpcSettings_Sentinel),
+    .settings = &N(NpcSettings_Sentinel_Wander),
     .flags = ENEMY_FLAG_IGNORE_ENTITY_COLLISION,
     .drops = NO_DROPS,
     .animations = SENTINEL_ANIMS,
@@ -318,7 +323,7 @@ NpcData N(NpcData_Sentinel_02) = {
             .detectSize = { 250, 145 },
         }
     },
-    .settings = &N(NpcSettings_Sentinel),
+    .settings = &N(NpcSettings_Sentinel_Wander),
     .flags = ENEMY_FLAG_IGNORE_ENTITY_COLLISION,
     .drops = NO_DROPS,
     .animations = SENTINEL_ANIMS,
@@ -447,7 +452,7 @@ NpcData N(NpcData_Clubba_Unused) = {
     .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_IGNORE_ENTITY_COLLISION,
     .drops = CLUBBA_DROPS,
     .animations = CLUBBA_ANIMS,
-    .extraAnimations = N(ExtraAnims_Clubba),
+    .limitAnimations = N(LimitAnims_Clubba),
     .aiDetectFlags = AI_DETECT_MOTION_SENSITIVE,
 };
 

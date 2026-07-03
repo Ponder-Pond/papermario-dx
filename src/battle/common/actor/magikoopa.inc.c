@@ -264,7 +264,6 @@ s32 N(BroomAnims)[] = {
 };
 
 #include "common/ShrinkActor.inc.c"
-#include "common/CosInterpMinMax.inc.c"
 
 EvtScript N(EVS_Idle) = {
     Set(LVarF, 0)
@@ -272,7 +271,7 @@ EvtScript N(EVS_Idle) = {
         Call(GetActorVar, ACTOR_SELF, AVAR_CloneActorID, LVar0)
         Call(ActorExists, LVar0, LVar1)
         IfEq(LVar1, 1)
-            Call(N(CosInterpMinMax), LVarF, LVar1, Float(254.0), Float(100.0), 20, 0, 0)
+            Call(CosInterpMinMax, LVarF, LVar1, Float(254.0), Float(100.0), 20, 0, 0)
             Add(LVarF, 1)
             Call(GetActorFlags, ACTOR_SELF, LVar2)
             IfFlag(LVar2, ACTOR_FLAG_FLYING)
@@ -323,7 +322,7 @@ EvtScript N(EVS_KnockDownCheck) = {
     End
 };
 
-#include "common/battle/SetAbsoluteStatusOffsets.inc.c"
+#include "battle/common/SetAbsoluteStatusOffsets.inc.c"
 #include "common/StartRumbleWithParams.inc.c"
 
 EvtScript N(EVS_KnockDown) = {
@@ -1523,7 +1522,7 @@ EvtScript N(EVS_Move_MakeClone) = {
     End
 };
 
-#include "common/battle/CheckMagikoopaCastTarget.inc.c"
+#include "battle/common/CheckMagikoopaCastTarget.inc.c"
 
 EvtScript N(EVS_Move_TryBoostAttack) = {
     Set(LFlag0, false)

@@ -23,9 +23,10 @@ typedef struct FuzzyThread {
 } FuzzyThread; //size = 0x48
 
 #include "world/common/util/ChangeNpcToPartner.inc.c"
+#include "world/common/util/LoadPartyImage.inc.c"
 
-#include "world/common/enemy/Fuzzy.inc.c"
-#include "world/common/npc/Koopa.inc.c"
+#include "world/common/enemy/Fuzzy/idle.inc.c"
+#include "world/common/npc/Koopa/idle.inc.c"
 
 #include "../common/GetIntoShell.inc.c"
 
@@ -37,8 +38,6 @@ s32 N(TreeHidingSpotPositions)[] = {
     158, 135, 157,
     281, 156, 202,
 };
-
-#include "common/CosInterpMinMax.inc.c"
 
 EvtScript N(EVS_AnimBranch_JumpTo) = {
     Set(LVar2, LVar0)
@@ -58,7 +57,7 @@ EvtScript N(EVS_AnimBranch_JumpTo) = {
         Add(LVar6, 1)
         SetF(LVar9, LVar8)
         MulF(LVar9, Float(-1.0))
-        Call(N(CosInterpMinMax), LVar6, LVar7, LVar9, LVar8, 3, 0, 0)
+        Call(CosInterpMinMax, LVar6, LVar7, LVar9, LVar8, 3, 0, 0)
         MulF(LVar8, Float(0.90625))
         Call(TranslateModel, LVar2, LVar7, LVar0, 0)
         IfEq(LVar1, 1)
@@ -851,10 +850,7 @@ EvtScript N(EVS_ShellPrompt) = {
     End
 };
 
-s32 N(ShellList)[] = {
-    ITEM_KOOPER_SHELL,
-    ITEM_NONE
-};
+ITEM_LIST(N(ShellList), ITEM_KOOPER_SHELL);
 
 EvtScript N(EVS_ChooseShell) = {
     BindPadlock(Ref(N(EVS_ShellPrompt)), TRIGGER_FORCE_ACTIVATE, 0, Ref(N(ShellList)), 0, 1)
@@ -898,7 +894,7 @@ EvtScript N(EVS_Scene_KooperArrives) = {
     Call(SetNpcAnimation, NPC_Kooper, ANIM_KooperWithoutShell_IdleAngry)
     Wait(20 * DT)
     Call(SpeakToPlayer, NPC_Kooper, ANIM_KooperWithoutShell_TalkAngry, ANIM_KooperWithoutShell_IdleAngry, 0, MSG_CH1_00C3)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(NpcFaceNpc, NPC_PARTNER, NPC_Kooper, 0)
     Call(SpeakToNpc, NPC_PARTNER, ANIM_WorldGoombario_Talk, ANIM_WorldGoombario_Idle, 0, NPC_Kooper, MSG_CH1_00C4)
     Call(SetNpcAnimation, NPC_Kooper, ANIM_KooperWithoutShell_Idle)
@@ -942,7 +938,7 @@ EvtScript N(EVS_Scene_KooperArrives) = {
     Call(NpcJump0, NPC_KoopersShell, LVar0, LVar1, LVar2, 30 * DT)
     Call(SetNpcPos, NPC_KoopersShell, NPC_DISPOSE_LOCATION)
     Call(SetNpcSprite, NPC_Kooper, ANIM_WorldKooper_Idle)
-    Call(SetNpcFlagBits, NPC_Kooper, NPC_FLAG_IGNORE_PLAYER_COLLISION, false)
+    Call(SetNpcFlagBits, NPC_Kooper, NPC_FLAG_IGNORE_CHAR_COLLISION, false)
     Call(SetNpcSprite, NPC_Kooper, ANIM_WorldKooper_Still)
     Wait(4 * DT)
     Call(EnableNpcBlur, NPC_KoopersShell, true)
@@ -985,7 +981,7 @@ EvtScript N(EVS_Scene_KooperArrives) = {
             Set(GB_StoryProgress, STORY_CH1_KOOPER_JOINED_PARTY)
         EndIf
     Call(N(ChangeNpcToPartner), NPC_Kooper, PARTNER_KOOPER)
-    Call(N(LoadPartyImage))
+    Call(N(LoadPartyImage), Ref("party_kameki"))
     Exec(N(EVS_PushPartnerSong))
     Wait(15 * DT)
     Call(ShowMessageAtScreenPos, MSG_Menus_018A, 160, 40)

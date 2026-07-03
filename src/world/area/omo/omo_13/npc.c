@@ -1,8 +1,8 @@
 #include "omo_13.h"
 #include "sprite/player.h"
 
-#include "world/common/enemy/ShyGuy_Wander.inc.c"
-#include "world/common/enemy/GrooveGuy.inc.c"
+#include "world/common/enemy/ShyGuy/wander.inc.c"
+#include "world/common/enemy/GrooveGuy/wander.inc.c"
 
 NpcSettings N(NpcSettings_AntiGuy) = {
     .height = 23,
@@ -11,13 +11,6 @@ NpcSettings N(NpcSettings_AntiGuy) = {
     .onHit = &EnemyNpcHit,
     .onDefeat = &EnemyNpcDefeat,
     .actionFlags = AI_ACTION_JUMP_WHEN_SEE_PLAYER,
-};
-
-#include "world/common/complete/ConsumableItemChoice.inc.c"
-
-s32 N(BribeItemList)[] = {
-    ITEM_LEMON_CANDY,
-    -1
 };
 
 EvtScript N(EVS_NpcInteract_AntiGuy) = {
@@ -62,10 +55,8 @@ EvtScript N(EVS_NpcInteract_AntiGuy) = {
         Call(SetPlayerAnimation, ANIM_Mario1_NodYes)
         Wait(15)
         Call(EndSpeech, NPC_SELF, ANIM_ShyGuy_Black_Anim11, ANIM_ShyGuy_Black_Anim01, 0)
-        Set(LVar0, Ref(N(BribeItemList)))
-        Set(LVar1, -1)
-        ExecWait(N(EVS_ChooseItem))
-        IfEq(LVar0, -1)
+        EVT_CHOOSE_CONSUMABLE_ONLY(ITEM_LEMON_CANDY, NPC_SELF)
+        IfEq(LVar0, ITEM_CHOICE_CANCELED)
             Call(SpeakToPlayer, NPC_SELF, ANIM_ShyGuy_Black_Anim11, ANIM_ShyGuy_Black_Anim01, 0, MSG_CH4_004B)
             Call(ShowChoice, MSG_Choice_0044)
             IfEq(LVar0, 0)
@@ -150,7 +141,7 @@ EvtScript N(EVS_NpcIdle_AntiGuy) = {
                 EndIf
             Goto(0)
         Else
-            Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+            Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
             Call(SetNpcAnimation, NPC_SELF, ANIM_ShyGuy_Black_Anim02)
             Call(GetNpcPos, NPC_SELF, LVar0, LVar1, LVar2)
             IfLt(LVar2, -60)
@@ -170,7 +161,7 @@ EvtScript N(EVS_NpcIdle_AntiGuy) = {
             Call(NpcMoveTo, NPC_SELF, LVar0, -100, 0)
             Call(InterpNpcYaw, NPC_SELF, 90, 0)
             Call(SetNpcAnimation, NPC_SELF, ANIM_ShyGuy_Black_Anim15)
-            Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_PLAYER_COLLISION, false)
+            Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_CHAR_COLLISION, false)
             Label(9)
                 Wait(1)
                 Goto(9)
@@ -217,24 +208,7 @@ NpcData N(NpcData_AntiGuy) = {
     .settings = &N(NpcSettings_AntiGuy),
     .flags = BASE_PASSIVE_FLAGS | ENEMY_FLAG_NO_DELAY_AFTER_FLEE | ENEMY_FLAG_ACTIVE_WHILE_OFFSCREEN | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER,
     .drops = NO_DROPS,
-    .animations = {
-        .idle   = ANIM_ShyGuy_Black_Anim01,
-        .walk   = ANIM_ShyGuy_Black_Anim02,
-        .run    = ANIM_ShyGuy_Black_Anim03,
-        .chase  = ANIM_ShyGuy_Black_Anim02,
-        .anim_4 = ANIM_ShyGuy_Black_Anim01,
-        .anim_5 = ANIM_ShyGuy_Black_Anim01,
-        .death  = ANIM_ShyGuy_Black_Anim0C,
-        .hit    = ANIM_ShyGuy_Black_Anim0C,
-        .anim_8 = ANIM_ShyGuy_Black_Anim15,
-        .anim_9 = ANIM_ShyGuy_Black_Anim12,
-        .anim_A = ANIM_ShyGuy_Black_Anim11,
-        .anim_B = ANIM_ShyGuy_Black_Anim10,
-        .anim_C = ANIM_ShyGuy_Black_Anim05,
-        .anim_D = ANIM_ShyGuy_Black_Anim01,
-        .anim_E = ANIM_ShyGuy_Black_Anim01,
-        .anim_F = ANIM_ShyGuy_Black_Anim01,
-    },
+    .animations = ANTI_GUY_ANIMS,
     .tattle = MSG_NpcTattle_AntiGuy,
 };
 
@@ -277,7 +251,7 @@ NpcData N(NpcData_GrooveGuy) = {
             .detectSize = { 200 },
         }
     },
-    .settings = &N(NpcSettings_GrooveGuy),
+    .settings = &N(NpcSettings_GrooveGuy_Wander),
     .flags = ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
     .drops = GROOVE_GUY_DROPS_B,
     .animations = GROOVE_GUY_ANIMS,

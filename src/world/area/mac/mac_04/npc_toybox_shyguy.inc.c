@@ -1,4 +1,6 @@
-#include "world/common/todo/GetFloorCollider.inc.c"
+#include "mac_04.h"
+
+#include "common.h"
 
 API_CALLABLE(N(IsPartnerBow)) {
     if (gPartnerStatus.actingPartner == PARTNER_BOW) {
@@ -66,7 +68,7 @@ EvtScript N(EVS_OpenSecretDoor) = {
 
 EvtScript N(EVS_SuspiciousGuy_RevealSecretRoom) = {
     Wait(20 * DT)
-    Call(SetNpcFlagBits, NPC_ShyGuy_01, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_ShyGuy_01, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Call(SpeakToPlayer, NPC_ShyGuy_01, ANIM_ShyGuy_Pink_Anim11, ANIM_ShyGuy_Pink_Anim01, 5, MSG_MAC_Housing_00B3)
     Call(SetNpcAnimation, NPC_ShyGuy_01, ANIM_ShyGuy_Pink_Anim02)
     Wait(4 * DT)
@@ -165,7 +167,7 @@ EvtScript N(EVS_HiddenRoom_WaitForOuttaSight) = {
         ExecWait(N(EVS_SuspiciousGuy_RevealSecretRoom))
     Else
         ExecWait(N(EVS_SuspiciousGuy_RunAway))
-        Call(N(GetFloorCollider), LVar0)
+        Call(GetPlayerFloorCollider, LVar0)
         Thread
             Wait(10 * DT)
             Exec(N(EVS_HiddenRoom_WaitForOuttaSight))

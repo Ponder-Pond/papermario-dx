@@ -1,6 +1,6 @@
 #include "kzn_01.h"
 
-#include "world/common/enemy/PutridPiranhaSentinel.inc.c"
+#include "world/common/enemy/PutridPiranhaSentinel/idle.inc.c"
 
 EvtScript N(EVS_NpcIdle_PutridPiranha) = {
     Label(0)
@@ -52,7 +52,7 @@ NpcData N(NpcPutridPiranha) = {
     .init = &N(EVS_NpcInit_PutridPiranha),
     .settings = &N(NpcSettings_PutridPiranhaSentinel),
     .flags = ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ACTIVE_WHILE_OFFSCREEN,
-    .drops = PIRANHA_NO_DROPS,
+    .drops = PIRANHA_SENTINEL_DROPS,
     .animations = PIRANHA_SENTINEL_ANIMS,
 };
 

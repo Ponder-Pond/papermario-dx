@@ -1,11 +1,11 @@
 #include "nok_11.h"
 
-#include "world/common/enemy/Goomba_Wander.inc.c"
-#include "world/common/enemy/KoopaTroopa_Wander.inc.c"
-#include "world/common/enemy/Paragoomba_Wander.inc.c"
-#include "world/common/enemy/SpikedGoomba_Wander.inc.c"
-#include "world/common/npc/JrTroopa.inc.c"
-#include "world/common/enemy/KentCKoopa.inc.c"
+#include "world/common/enemy/Goomba/wander.inc.c"
+#include "world/common/enemy/KoopaTroopa/wander.inc.c"
+#include "world/common/enemy/Paragoomba/wander.inc.c"
+#include "world/common/enemy/SpikedGoomba/wander.inc.c"
+#include "world/common/npc/JrTroopa/idle.inc.c"
+#include "world/common/enemy/KentCKoopa/idle.inc.c"
 
 #include "foliage.h"
 
@@ -126,7 +126,7 @@ EvtScript N(EVS_NpcIdle_JrTroopa_01) = {
     Call(SetNpcAnimation, NPC_SELF, ANIM_JrTroopa_PointTapFoot)
     Call(SetCamProperties, CAM_DEFAULT, Float(90.0), -140, 0, -40, 250, Float(15.0), Float(-8.5))
     Call(SpeakToPlayer, NPC_SELF, ANIM_JrTroopa_PointTalk, ANIM_JrTroopa_PointTapFoot, 0, MSG_CH1_0121)
-    Call(DisablePartnerAI, 0)
+    Call(DisablePartnerAI, false)
     Call(GetCurrentPartnerID, LVar0)
     Switch(LVar0)
         CaseEq(PARTNER_GOOMBARIO)
@@ -235,7 +235,7 @@ API_CALLABLE(N(KentTakeCoins)) {
 EvtScript N(EVS_NpcIdle_KentCKoopa_01) = {
     Label(1)
         Call(GetPlayerPos, LVar0, LVar1, LVar2)
-        IfEq(AB_NOK_2, 0)
+        IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
             IfGe(LVar0, -260)
                 Goto(10)
             Else
@@ -256,7 +256,7 @@ EvtScript N(EVS_NpcIdle_KentCKoopa_01) = {
     Call(InterruptUsePartner)
     Call(SetMusic, 0, SONG_MINIBOSS_BATTLE, 0, VOL_LEVEL_FULL)
     Call(SpeakToPlayer, NPC_KentCKoopa_02, ANIM_KentCKoopa_Anim02, ANIM_KentCKoopa_Anim01, 0, MSG_CH1_012C)
-    IfEq(AB_NOK_2, 0)
+    IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
         Set(LVar0, 20)
     Else
         Set(LVar0, -20)
@@ -272,7 +272,7 @@ EvtScript N(EVS_NpcIdle_KentCKoopa_01) = {
     IfEq(LVar0, 1)
         Goto(50)
     EndIf
-    IfEq(AB_NOK_2, 0)
+    IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
         Set(LVar0, 20)
     Else
         Set(LVar0, -20)
@@ -291,29 +291,21 @@ EvtScript N(EVS_NpcIdle_KentCKoopa_01) = {
     Label(20)
     Call(ContinueSpeech, NPC_KentCKoopa_02, ANIM_KentCKoopa_Anim02, ANIM_KentCKoopa_Anim01, 0, MSG_CH1_0135)
     Call(StartBossBattle, SONG_SPECIAL_BATTLE)
-    IfEq(AB_NOK_2, 0)
+    IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
         Set(LVar0, 20)
     Else
         Set(LVar0, -20)
     EndIf
-#if VERSION_JP
-    IfEq(AF_NOK_14, 0)
-        Call(SpeakToPlayer, NPC_KentCKoopa_02, ANIM_KentCKoopa_Anim02, ANIM_KentCKoopa_Anim01, 0, MSG_CH1_0136)
-    Else
-        Call(SpeakToPlayer, NPC_KentCKoopa_02, ANIM_KentCKoopa_Anim02, ANIM_KentCKoopa_Anim01, 0, MSG_CH1_0139)
-    EndIf
-#else
     Call(SpeakToPlayer, NPC_KentCKoopa_02, ANIM_KentCKoopa_Anim02, ANIM_KentCKoopa_Anim01, 0, MSG_CH1_0136)
-#endif
     Call(SetNpcAnimation, NPC_KentCKoopa_02, ANIM_KentCKoopa_Anim05)
-    IfEq(AB_NOK_2, 0)
+    IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
         Set(LVar0, 90)
     Else
         Set(LVar0, 270)
     EndIf
     Call(InterpNpcYaw, NPC_KentCKoopa_02, LVar0, 0)
     Wait(30)
-    IfEq(AB_NOK_2, 0)
+    IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
         Set(LVar0, 125)
     Else
         Set(LVar0, -430)
@@ -330,7 +322,7 @@ EvtScript N(EVS_NpcIdle_KentCKoopa_01) = {
     EndIf
     Call(CloseMessage)
     Call(GetPlayerPos, LVar0, LVar1, LVar2)
-    IfEq(AB_NOK_2, 0)
+    IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
         Set(LVar0, -215)
     Else
         Set(LVar0, -100)
@@ -344,11 +336,11 @@ EvtScript N(EVS_NpcIdle_KentCKoopa_01) = {
     Wait(20)
     Call(SetNpcAnimation, NPC_KentCKoopa_02, ANIM_KentCKoopa_Anim03)
     Call(NpcMoveTo, NPC_KentCKoopa_02, -167, -100, 20)
-    Call(SetNpcFlagBits, NPC_KentCKoopa_02, NPC_FLAG_IGNORE_PLAYER_COLLISION, false)
+    Call(SetNpcFlagBits, NPC_KentCKoopa_02, NPC_FLAG_IGNORE_CHAR_COLLISION, false)
     Call(BindNpcInteract, NPC_KentCKoopa_02, Ref(N(EVS_NpcInteract_KentCKoopa_02)))
     Call(SetNpcPos, NPC_SELF, NPC_DISPOSE_LOCATION)
     Call(SetNpcAnimation, NPC_KentCKoopa_02, ANIM_KentCKoopa_Anim01)
-    IfEq(AB_NOK_2, 0)
+    IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
         Set(LVar0, 270)
     Else
         Set(LVar0, 90)
@@ -367,7 +359,7 @@ EvtScript N(EVS_NpcIdle_KentCKoopa_01) = {
     Call(DisablePlayerInput, false)
     Label(41)
         Call(GetPlayerPos, LVar0, LVar1, LVar2)
-        IfEq(AB_NOK_2, 0)
+        IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
             IfGe(LVar0, -255)
                 Set(LVar3, -256)
                 Goto(43)
@@ -403,7 +395,7 @@ EvtScript N(EVS_NpcIdle_KentCKoopa_01) = {
     Call(DisablePlayerInput, false)
     Label(51)
         Call(GetPlayerPos, LVar0, LVar1, LVar2)
-        IfEq(AB_NOK_2, 0)
+        IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
             IfGe(LVar0, -255)
                 Set(LVar3, -256)
                 Goto(53)
@@ -427,7 +419,7 @@ EvtScript N(EVS_NpcIdle_KentCKoopa_01) = {
     Call(SetMusic, 0, SONG_MINIBOSS_BATTLE, 0, VOL_LEVEL_FULL)
     Call(SetPlayerPos, LVar3, LVar1, LVar2)
     Call(SpeakToPlayer, NPC_KentCKoopa_02, ANIM_KentCKoopa_Anim02, ANIM_KentCKoopa_Anim01, 0, MSG_CH1_0132)
-    IfEq(AB_NOK_2, 0)
+    IfEq(AB_NOK11_KentEntryID, nok_11_ENTRY_0)
         Set(LVar0, 20)
     Else
         Set(LVar0, -20)
@@ -569,15 +561,15 @@ EvtScript N(EVS_NpcInit_KentCKoopa_01) = {
     Call(BindNpcIdle, NPC_SELF, Ref(N(EVS_NpcIdle_KentCKoopa_01)))
     Call(BindNpcDefeat, NPC_SELF, Ref(N(EVS_NpcDefeat_KentCKoopa_01)))
     Call(EnableNpcShadow, NPC_SELF, false)
-    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
-    Call(GetEntryID, AB_NOK_2)
+    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
+    Call(GetEntryID, AB_NOK11_KentEntryID)
     Return
     End
 };
 
 EvtScript N(EVS_NpcInit_KentCKoopa_02) = {
     Call(BindNpcDefeat, NPC_SELF, Ref(N(EVS_NpcDefeat_KentCKoopa_02)))
-    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_PLAYER_COLLISION, true)
+    Call(SetNpcFlagBits, NPC_SELF, NPC_FLAG_IGNORE_CHAR_COLLISION, true)
     Call(GetEntryID, LVar3)
     IfEq(LVar3, nok_11_ENTRY_0)
         Call(SetNpcYaw, NPC_SELF, 270)
