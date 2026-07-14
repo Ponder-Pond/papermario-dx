@@ -8,6 +8,7 @@
 #include "nu/nusys.h"
 #include "backtrace.h"
 #include "PR/osint.h"
+#include "dx/overlay.h"
 
 /** Enable to debug why a backtrace is wrong */
 #define BACKTRACE_DEBUG 0
@@ -346,10 +347,9 @@ s32 address2symbol(u32 address, Symbol* out) {
     }
 
     // Read symbols in chunks
-    static Symbol chunk[chunkSize];
+    static Symbol chunk[symbolsPerChunk];
     s32 i;
     for (i = 0; i < symt.symbolCount; i++) {
-        // Do we need to load the next chunk?
         if (i % symbolsPerChunk == 0) {
             u32 chunkAddr = symbolTableRomAddr + sizeof(SymbolTable) + (i / symbolsPerChunk) * chunkSize;
             nuPiReadRom(chunkAddr, chunk, chunkSize);
@@ -361,11 +361,8 @@ s32 address2symbol(u32 address, Symbol* out) {
             *out = sym;
             return 0;
         } else if (address < sym.address) {
-            // Symbols are sorted by address, so if we passed the address, we can stop
             break;
         } else {
-            // Keep searching, but remember this as the last symbol
-            // incase we don't find an exact match
             *out = sym;
         }
     }
@@ -385,30 +382,159 @@ char* load_symbol_string(char* dest, u32 addr, int n) {
     return (char*)((u32)dest + (addr & 3));
 }
 
-void backtrace_address_to_string(u32 address, char* dest) {
+/**
+ * @brief Look up a symbol in an overlay's debug symbol table stored in ROM.
+ *
+ * Addresses in the table are stored as offsets from LINK_ADDR (0x80000000).
+ * The caller passes `offset = addr - overlay_base` as the lookup key.
+ */
+s32 ovl_address2symbol(u32 offset, u32 debugRomStart, u32 debugRomEnd, Symbol* out) {
+    #define symbolsPerChunk 0x1000
+    #define chunkSize ((sizeof(Symbol) * symbolsPerChunk))
+
+    SymbolTable symt;
+    nuPiReadRom(debugRomStart, &symt, sizeof(SymbolTable));
+    if (symt.magic[0] != 'S' || symt.magic[1] != 'Y' || symt.magic[2] != 'M' || symt.magic[3] != 'S') {
+        return -1;
+    }
+    if (symt.symbolCount <= 0) {
+        return -1;
+    }
+
+    static Symbol chunk[symbolsPerChunk];
+    s32 i;
+    for (i = 0; i < symt.symbolCount; i++) {
+        if (i % symbolsPerChunk == 0) {
+            u32 chunkAddr = debugRomStart + sizeof(SymbolTable) + (i / symbolsPerChunk) * chunkSize;
+            nuPiReadRom(chunkAddr, chunk, chunkSize);
+        }
+
+        Symbol sym = chunk[i % symbolsPerChunk];
+
+        if (sym.address == offset) {
+            *out = sym;
+            return 0;
+        } else if (offset < sym.address) {
+            break;
+        } else {
+            *out = sym;
+        }
+    }
+    return offset - out->address;
+
+    #undef symbolsPerChunk
+    #undef chunkSize
+}
+
+/// Extract file basename and line number from a symbol table file string.
+/// File strings are stored as "file.c:123" or just "file.c" (with line -1).
+/// If lineOverride >= 0, it replaces the parsed line number.
+static void parse_file_string(char* filep, char* outFile, s32 outFileSize, s32* outLine, s32 lineOverride) {
+    outFile[0] = '\0';
+    *outLine = -1;
+
+    if (filep != nullptr) {
+        char* colon = strchr(filep, ':');
+        if (colon != nullptr) {
+            *colon = '\0';
+            // Parse line number (no atoi available)
+            s32 num = 0;
+            for (char* p = colon + 1; *p >= '0' && *p <= '9'; p++) {
+                num = num * 10 + (*p - '0');
+            }
+            *outLine = num;
+        }
+        strncpy(outFile, filep, outFileSize - 1);
+        outFile[outFileSize - 1] = '\0';
+    }
+
+    if (lineOverride >= 0) {
+        *outLine = lineOverride;
+    }
+}
+
+void backtrace_resolve_addr(u32 address, ResolvedSym* out, s32 lineOverride) {
+    out->name[0] = '\0';
+    out->file[0] = '\0';
+    out->overlay[0] = '\0';
+    out->line = -1;
+
+    const char* ovl_name = nullptr;
+    u32 debugRomStart = 0, debugRomEnd = 0, ovlBase = 0;
+    const char* ovl_sym_name = ovl_resolve_addr(address, &ovl_name,
+                                              &debugRomStart, &debugRomEnd, &ovlBase);
+    if (ovl_sym_name != nullptr) {
+        if (ovl_name != nullptr) {
+            strncpy(out->overlay, ovl_name, sizeof(out->overlay) - 1);
+        }
+
+        if (debugRomStart != 0) {
+            u32 offset = address - ovlBase;
+            Symbol sym;
+            s32 sym_offset = ovl_address2symbol(offset, debugRomStart, debugRomEnd, &sym);
+            if (sym_offset >= 0 && sym_offset < 0x1000) {
+                char name_buf[0x40];
+                char file_buf[0x40];
+                char* namep = load_symbol_string(name_buf, sym.nameOffset, ARRAY_COUNT(name_buf));
+                char* filep = load_symbol_string(file_buf, sym.fileOffset, ARRAY_COUNT(file_buf));
+
+                if (namep != nullptr) {
+                    strncpy(out->name, namep, sizeof(out->name) - 1);
+                }
+                parse_file_string(filep, out->file, sizeof(out->file), &out->line, lineOverride);
+                return;
+            }
+        }
+        if (ovl_sym_name[0] != '\0') {
+            strncpy(out->name, ovl_sym_name, sizeof(out->name) - 1);
+        } else {
+            sprintf(out->name, "0x%08lX", address);
+        }
+        if (lineOverride >= 0) out->line = lineOverride;
+        return;
+    }
+
     Symbol sym;
     s32 offset = address2symbol(address, &sym);
 
-    if (offset >= 0 && offset < 0x1000) { // 0x1000 = arbitrary func size limit
-        char name[0x40];
-        char file[0x40];
-        char* namep = load_symbol_string(name, sym.nameOffset, ARRAY_COUNT(name));
-        char* filep = load_symbol_string(file, sym.fileOffset, ARRAY_COUNT(file));
+    if (offset >= 0 && offset < 0x1000) {
+        char name_buf[0x40];
+        char file_buf[0x40];
+        char* namep = load_symbol_string(name_buf, sym.nameOffset, ARRAY_COUNT(name_buf));
+        char* filep = load_symbol_string(file_buf, sym.fileOffset, ARRAY_COUNT(file_buf));
 
-        offset = 0; // Don't show offsets
-
-        if (filep == nullptr)
-            if (offset == 0)
-                sprintf(dest, "%s", namep);
-            else
-                sprintf(dest, "%s+0x%lX", namep, offset);
-        else
-            if (offset == 0)
-                sprintf(dest, "%s (%s)", namep, filep);
-            else
-                sprintf(dest, "%s (%s+0x%lX)", namep, filep, offset);
+        if (namep != nullptr) {
+            strncpy(out->name, namep, sizeof(out->name) - 1);
+        }
+        parse_file_string(filep, out->file, sizeof(out->file), &out->line, lineOverride);
     } else {
-        sprintf(dest, "0x%lX", address);
+        sprintf(out->name, "0x%08lX", address);
+        if (lineOverride >= 0) out->line = lineOverride;
+    }
+}
+
+void backtrace_address_to_string(u32 address, char* dest, s32 line) {
+    ResolvedSym sym;
+    backtrace_resolve_addr(address, &sym, line);
+
+    // Build a single-line string for debug_backtrace() and other callers
+    s32 pos = sprintf(dest, "%s", sym.name);
+    b32 hasMeta = sym.file[0] != '\0' || sym.overlay[0] != '\0' || sym.line >= 0;
+    if (hasMeta) {
+        pos += sprintf(dest + pos, " (");
+        if (sym.overlay[0] != '\0') {
+            pos += sprintf(dest + pos, "%s", sym.overlay);
+            if (sym.file[0] != '\0') {
+                pos += sprintf(dest + pos, " ");
+            }
+        }
+        if (sym.file[0] != '\0') {
+            pos += sprintf(dest + pos, "%s", sym.file);
+        }
+        if (sym.line >= 0) {
+            pos += sprintf(dest + pos, ":%ld", sym.line);
+        }
+        sprintf(dest + pos, ")");
     }
 }
 
@@ -420,7 +546,7 @@ void debug_backtrace(void) {
 
     debugf("Backtrace:\n");
     for (i = 0; i < max; i++) {
-        backtrace_address_to_string(bt[i], buf);
+        backtrace_address_to_string(bt[i], buf, -1);
         debugf("    %s\n", buf);
     }
 }

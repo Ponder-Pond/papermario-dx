@@ -1,0 +1,110 @@
+#include "trd_06.h"
+
+#include "world/common/enemy/KoopaBros/wander.inc.c"
+
+EvtScript N(EVS_Scene_ImprisonedKoopaBros) = {
+    Wait(60)
+    Call(EnableNpcAI, NPC_KoopaBros_Red, false)
+    Call(SpeakToPlayer, NPC_KoopaBros_Red, ANIM_KoopaBros_Red_Dizzy, ANIM_KoopaBros_Red_Dizzy, 0, MSG_CH1_010C)
+    Call(EnableNpcAI, NPC_KoopaBros_Red, true)
+    Wait(30)
+    Call(FadeOutMusic, 0, 2000)
+    Wait(30)
+    Call(GetEntryID, LVar0)
+    Call(GotoMap, Ref("trd_10"), trd_10_ENTRY_1)
+    Wait(100)
+    Return
+    End
+};
+
+NpcData N(NpcData_KoopaBros)[] = {
+    {
+        .id = NPC_KoopaBros_Red,
+        .pos = { 60.0f, 0.0f, -60.0f },
+        .yaw = 0,
+        .territory = {
+            .wander = {
+                .isFlying = true,
+                .moveSpeedOverride = NO_OVERRIDE_MOVEMENT_SPEED,
+                .wanderShape = SHAPE_CYLINDER,
+                .centerPos  = { 60, 0, -60 },
+                .wanderSize = { 20 },
+                .detectShape = SHAPE_CYLINDER,
+                .detectPos  = { 60, 0, -60 },
+                .detectSize = { 0 },
+            }
+        },
+        .settings = &N(NpcSettings_KoopaBros),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
+        .drops = NO_DROPS,
+        .animations = RED_KOOPA_BROS_ANIMS,
+    },
+    {
+        .id = NPC_KoopaBros_Black,
+        .pos = { 60.0f, 0.0f, 0.0f },
+        .yaw = 0,
+        .territory = {
+            .wander = {
+                .isFlying = true,
+                .moveSpeedOverride = NO_OVERRIDE_MOVEMENT_SPEED,
+                .wanderShape = SHAPE_CYLINDER,
+                .centerPos  = { 60, 0, 0 },
+                .wanderSize = { 20 },
+                .detectShape = SHAPE_CYLINDER,
+                .detectPos  = { 60, 0, 60 },
+                .detectSize = { 0 },
+            }
+        },
+        .settings = &N(NpcSettings_KoopaBros),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
+        .drops = NO_DROPS,
+        .animations = BLACK_KOOPA_BROS_ANIMS,
+    },
+    {
+        .id = NPC_KoopaBros_Yellow,
+        .pos = { -10.0f, 0.0f, -60.0f },
+        .yaw = 0,
+        .territory = {
+            .wander = {
+                .isFlying = true,
+                .moveSpeedOverride = NO_OVERRIDE_MOVEMENT_SPEED,
+                .wanderShape = SHAPE_CYLINDER,
+                .centerPos  = { -10, 0, -60 },
+                .wanderSize = { 20 },
+                .detectShape = SHAPE_CYLINDER,
+                .detectPos  = { -10, 0, -60 },
+                .detectSize = { 0 },
+            }
+        },
+        .settings = &N(NpcSettings_KoopaBros),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
+        .drops = NO_DROPS,
+        .animations = YELLOW_KOOPA_BROS_ANIMS,
+    },
+    {
+        .id = NPC_KoopaBros_Green,
+        .pos = { 0.0f, 0.0f, 0.0f },
+        .yaw = 0,
+        .territory = {
+            .wander = {
+                .isFlying = true,
+                .moveSpeedOverride = NO_OVERRIDE_MOVEMENT_SPEED,
+                .wanderShape = SHAPE_CYLINDER,
+                .centerPos  = { 0, 0, 0 },
+                .wanderSize = { 20 },
+                .detectShape = SHAPE_CYLINDER,
+                .detectPos  = { -10, 0, 60 },
+                .detectSize = { 0 },
+            }
+        },
+        .settings = &N(NpcSettings_KoopaBros),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
+        .drops = NO_DROPS,
+        .animations = GREEN_KOOPA_BROS_ANIMS,
+    },
+};
+
+NpcGroupList N(NpcGroup_KoopaBros) = {
+    NPC_GROUP(N(NpcData_KoopaBros)),
+    {}
+};

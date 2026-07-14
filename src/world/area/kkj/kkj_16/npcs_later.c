@@ -1,0 +1,219 @@
+#include "kkj_16.h"
+#include "sprite/player.h"
+
+AnimID N(LimitAnims_HammerBros_Later)[] = {
+    ANIM_HammerBros_Still,
+    ANIM_HammerBros_Idle,
+    ANIM_HammerBros_IdleDisarmed,
+    ANIM_HammerBros_Walk,
+    ANIM_HammerBros_WalkDisarmed,
+    ANIM_HammerBros_Run,
+    ANIM_HammerBros_RunDisarmed,
+    ANIM_HammerBros_Talk,
+    ANIM_HammerBros_TalkDisarmed,
+    ANIM_HammerBros_GotItem,
+    ANIM_LIST_END
+};
+
+EvtScript N(EVS_NpcInteract_HammerBros_01_Later) = {
+    IfEq(GF_KKJ16_Gift_ShootingStar, false)
+        Call(SpeakToPlayer, NPC_SELF, ANIM_HammerBros_Talk, ANIM_HammerBros_Idle, 16, MSG_Peach_013A)
+        Call(ShowGotItem, ITEM_SHOOTING_STAR, true, ITEM_PICKUP_FLAG_NO_ANIMS)
+        Set(GF_KKJ16_Gift_ShootingStar, true)
+    Else
+        Call(SpeakToPlayer, NPC_SELF, ANIM_HammerBros_Talk, ANIM_HammerBros_Idle, 16, MSG_Peach_013B)
+    EndIf
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcInteract_HammerBros_02_Later) = {
+    Call(DisablePlayerInput, true)
+    Call(GetSelfVar, 0, LVar0)
+    IfEq(LVar0, 0)
+        Call(SpeakToPlayer, NPC_SELF, ANIM_HammerBros_Talk, ANIM_HammerBros_Idle, 0, MSG_Peach_0136)
+        Call(SetSelfVar, 0, 1)
+    Else
+        Call(SpeakToPlayer, NPC_SELF, ANIM_HammerBros_Talk, ANIM_HammerBros_Idle, 0, MSG_Peach_0137)
+        Call(SetSelfVar, 0, 0)
+    EndIf
+    Call(DisablePlayerInput, false)
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcInteract_HammerBros_03_Later) = {
+    Call(DisablePlayerInput, true)
+    Call(GetSelfVar, 0, LVar0)
+    IfEq(LVar0, 0)
+        Call(SpeakToPlayer, NPC_SELF, ANIM_HammerBros_Talk, ANIM_HammerBros_Idle, 0, MSG_Peach_0138)
+        Call(SetSelfVar, 0, 1)
+    Else
+        Call(SpeakToPlayer, NPC_SELF, ANIM_HammerBros_Talk, ANIM_HammerBros_Idle, 0, MSG_Peach_0139)
+        Call(SetSelfVar, 0, 0)
+    EndIf
+    Call(DisablePlayerInput, false)
+    Return
+    End
+};
+
+EvtScript N(EVS_CapturePeach_Later) = {
+    Call(DisablePlayerInput, true)
+    Call(PreventNextPeachDisguise)
+    SetGroup(EVT_GROUP_NEVER_PAUSE)
+    Call(SetTimeFreezeMode, TIME_FREEZE_PARTIAL)
+    Call(PlaySoundAtNpc, NPC_SELF, SOUND_EMOTE_IDEA, SOUND_SPACE_DEFAULT)
+    Call(ShowEmote, NPC_SELF, EMOTE_EXCLAMATION, 0, 20, EMOTER_NPC, 0, 0, 0, 0)
+    Call(NpcFacePlayer, NPC_SELF, 0)
+    Wait(20)
+    Call(PlayerFaceNpc, NPC_SELF, false)
+    Call(SetPlayerAnimation, ANIM_Peach2_Gasp)
+    Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Idle)
+    Call(SpeakToPlayer, NPC_SELF, ANIM_HammerBros_Talk, ANIM_HammerBros_Idle, 0, MSG_Peach_0174)
+    Call(N(GetApproachPeachPos), NPC_SELF, 50, LVar3, LVar0, LVar2)
+    IfNe(LVar3, 0)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Run)
+        Call(SetNpcSpeed, NPC_SELF, Float(5.0))
+        Call(NpcMoveTo, NPC_SELF, LVar0, LVar2, 0)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Idle)
+    EndIf
+    Call(SpeakToPlayer, NPC_SELF, ANIM_HammerBros_Talk, ANIM_HammerBros_Idle, 0, MSG_Peach_0175)
+    Call(SetPlayerAnimation, ANIM_Peach2_ForwardSad)
+    Wait(20)
+    Call(GotoMapSpecial, Ref("kkj_14"), kkj_14_ENTRY_B, TRANSITION_PEACH_CAPTURED)
+    Wait(100)
+    Call(DisablePlayerInput, false)
+    Return
+    End
+};
+
+EvtScript N(EVS_WatchForPlayer_Later) = {
+    Loop(0)
+        Call(GetPeachDisguise, LVar1)
+        IfEq(LVar1, PEACH_DISGUISE_NONE)
+            Call(SetSelfEnemyFlagBits, ENEMY_FLAG_CANT_INTERACT, true)
+            Call(N(CheckPlayerInSight), LVar0, 85, 60, 38)
+            IfNe(LVar0, 0)
+                Call(BindNpcAI, NPC_SELF, Ref(N(EVS_CapturePeach_Later)))
+                Return
+            EndIf
+        Else
+            Call(SetSelfEnemyFlagBits, ENEMY_FLAG_CANT_INTERACT, false)
+        EndIf
+        Wait(1)
+    EndLoop
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcIdle_HammerBros_01_Later) = {
+    Exec(N(EVS_WatchForPlayer_Later))
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcIdle_HammerBros_02_Later) = {
+    Exec(N(EVS_WatchForPlayer_Later))
+    Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Walk)
+    Call(SetNpcSpeed, NPC_SELF, Float(1.7))
+    Loop(0)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Idle)
+        Wait(20)
+        Call(InterpNpcYaw, NPC_SELF, 90, 15)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Walk)
+        Call(NpcMoveTo, NPC_SELF, 280, 50, 0)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Idle)
+        Wait(20)
+        Call(InterpNpcYaw, NPC_SELF, 270, 15)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Walk)
+        Call(NpcMoveTo, NPC_SELF, 80, 50, 0)
+    EndLoop
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcIdle_HammerBros_03_Later) = {
+    Exec(N(EVS_WatchForPlayer_Later))
+    Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Walk)
+    Call(SetNpcSpeed, NPC_SELF, Float(1.7))
+    Loop(0)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Idle)
+        Wait(30)
+        Call(InterpNpcYaw, NPC_SELF, 270, 15)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Walk)
+        Call(NpcMoveTo, NPC_SELF, -600, 50, 0)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Idle)
+        Wait(30)
+        Call(InterpNpcYaw, NPC_SELF, 90, 15)
+        Call(SetNpcAnimation, NPC_SELF, ANIM_HammerBros_Walk)
+        Call(NpcMoveTo, NPC_SELF, -420, 50, 0)
+    EndLoop
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcInit_HammerBros_01_Later) = {
+    Call(SetNpcPos, NPC_SELF, -700, 0, 50)
+    Call(SetNpcYaw, NPC_SELF, 90)
+    Call(BindNpcIdle, NPC_SELF, Ref(N(EVS_NpcIdle_HammerBros_01_Later)))
+    Call(BindNpcInteract, NPC_SELF, Ref(N(EVS_NpcInteract_HammerBros_01_Later)))
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcInit_HammerBros_02_Later) = {
+    Call(SetNpcPos, NPC_SELF, 180, 0, 50)
+    Call(BindNpcIdle, NPC_SELF, Ref(N(EVS_NpcIdle_HammerBros_02_Later)))
+    Call(BindNpcInteract, NPC_SELF, Ref(N(EVS_NpcInteract_HammerBros_02_Later)))
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcInit_HammerBros_03_Later) = {
+    Call(SetNpcPos, NPC_SELF, -510, 0, 50)
+    Call(BindNpcIdle, NPC_SELF, Ref(N(EVS_NpcIdle_HammerBros_03_Later)))
+    Call(BindNpcInteract, NPC_SELF, Ref(N(EVS_NpcInteract_HammerBros_03_Later)))
+    Return
+    End
+};
+
+NpcData N(NpcData_Minions_Later)[] = {
+    {
+        .id = NPC_HammerBros_01,
+        .pos = { 0.0f, -500.0f, 0.0f },
+        .yaw = 0,
+        .init = &N(EVS_NpcInit_HammerBros_01_Later),
+        .settings = &N(NpcSettings_HammerBros),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING | ENEMY_FLAG_DO_NOT_AUTO_FACE_PLAYER,
+        .drops = NO_DROPS,
+        .animations = HAMMER_BROS_ANIMS,
+        .limitAnimations = N(LimitAnims_HammerBros_Later),
+    },
+    {
+        .id = NPC_HammerBros_02,
+        .pos = { 0.0f, -500.0f, 0.0f },
+        .yaw = 0,
+        .init = &N(EVS_NpcInit_HammerBros_02_Later),
+        .settings = &N(NpcSettings_HammerBros),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
+        .drops = NO_DROPS,
+        .animations = HAMMER_BROS_ANIMS,
+        .limitAnimations = N(LimitAnims_HammerBros_Later),
+    },
+    {
+        .id = NPC_HammerBros_03,
+        .pos = { 0.0f, -500.0f, 0.0f },
+        .yaw = 0,
+        .init = &N(EVS_NpcInit_HammerBros_03_Later),
+        .settings = &N(NpcSettings_HammerBros),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
+        .drops = NO_DROPS,
+        .animations = HAMMER_BROS_ANIMS,
+        .limitAnimations = N(LimitAnims_HammerBros_Later),
+    },
+};
+
+NpcGroupList N(LaterNPCs) = {
+    NPC_GROUP(N(NpcData_Minions_Later)),
+    {}
+};

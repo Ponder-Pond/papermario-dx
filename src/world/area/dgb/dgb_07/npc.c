@@ -1,0 +1,35 @@
+#include "dgb_07.h"
+
+#include "world/common/enemy/Clubba/napping.inc.c"
+
+NpcData N(NpcData_Clubba_01)[] = {
+    {
+        .id = NPC_Clubba_01,
+        .pos = { -500.0f, 0.0f, -240.0f },
+        .yaw = 270,
+        .territory = {
+            .wander = {
+                .isFlying = true,
+                .moveSpeedOverride = NO_OVERRIDE_MOVEMENT_SPEED,
+                .wanderShape = SHAPE_CYLINDER,
+                .centerPos  = { -500, 0, -240 },
+                .wanderSize = { 40 },
+                .detectShape = SHAPE_CYLINDER,
+                .detectPos  = { -500, 0, -240 },
+                .detectSize = { 200 },
+            }
+        },
+        .settings = &N(NpcSettings_Clubba_Napping),
+        .flags = ENEMY_FLAG_FLYING,
+        .drops = CLUBBA_DROPS,
+        .animations = CLUBBA_ANIMS,
+        .limitAnimations = N(LimitAnims_Clubba),
+        .aiDetectFlags = AI_DETECT_MOTION_SENSITIVE,
+    },
+    CLUBBA_MACE_HITBOX(NPC_Clubba_01_Hitbox),
+};
+
+NpcGroupList N(DefaultNPCs) = {
+    NPC_GROUP(N(NpcData_Clubba_01), BTL_DGB_FORMATION_01, BTL_DGB_STAGE_02),
+    {}
+};

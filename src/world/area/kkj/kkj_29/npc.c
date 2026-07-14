@@ -1,0 +1,114 @@
+#include "kkj_29.h"
+
+#include "world/common/npc/Bowser/idle.inc.c"
+#include "world/common/enemy/Koopatrol/idle.inc.c"
+#include "world/common/enemy/HammerBros/idle.inc.c"
+
+EvtScript N(EVS_NpcInit_HammerBros) = {
+    Call(SetNpcPos, NPC_SELF, 0, 0, -25)
+    Call(SetNpcYaw, NPC_SELF, 90)
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcInit_Koopatrol_01) = {
+    Call(SetNpcPos, NPC_SELF, 175, 0, -25)
+    Call(SetNpcYaw, NPC_SELF, 270)
+    Return
+    End
+};
+
+EvtScript N(EVS_NpcInit_Koopatrol_02) = {
+    Call(SetNpcAnimation, NPC_SELF, ANIM_WorldKoopatrol_IdleForward)
+    Call(SetNpcPos, NPC_SELF, -140, 30, -140)
+    Return
+    End
+};
+
+AnimID N(LimitAnims_Bowser)[] = {
+    ANIM_WorldBowser_Still,
+    ANIM_WorldBowser_Idle,
+    ANIM_WorldBowser_Walk,
+    ANIM_WorldBowser_Talk,
+    ANIM_WorldBowser_TalkEyesClosed,
+    ANIM_WorldBowser_AngryTalk,
+    ANIM_WorldBowser_Shock,
+    ANIM_WorldBowser_RearUpMock,
+    ANIM_LIST_END
+};
+
+AnimID N(LimitAnims_HammerBros)[] = {
+    ANIM_HammerBros_StillDisarmed,
+    ANIM_HammerBros_IdleDisarmed,
+    ANIM_HammerBros_WalkDisarmed,
+    ANIM_HammerBros_CarryFast,
+    ANIM_HammerBros_RunDisarmed,
+    ANIM_HammerBros_TalkDisarmed,
+    ANIM_HammerBros_Lift,
+    ANIM_LIST_END
+};
+
+AnimID N(LimitAnims_Koopatrol)[] = {
+    ANIM_WorldKoopatrol_Still,
+    ANIM_WorldKoopatrol_Idle,
+    ANIM_WorldKoopatrol_IdleForward,
+    ANIM_WorldKoopatrol_Walk,
+    ANIM_WorldKoopatrol_Talk,
+    ANIM_WorldKoopatrol_RaisedArms,
+    ANIM_WorldKoopatrol_CheerForward,
+    ANIM_WorldKoopatrol_SulkForward,
+    ANIM_WorldKoopatrol_Lift,
+    ANIM_WorldKoopatrol_CarryFast,
+    ANIM_LIST_END
+};
+
+NpcData N(NpcData_Characters)[] = {
+    {
+        .id = NPC_Bowser,
+        .pos = { 0.0f, -500.0f, 0.0f },
+        .yaw = 270,
+        .settings = &N(NpcSettings_Bowser),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION | ENEMY_FLAG_FLYING,
+        .drops = NO_DROPS,
+        .animations = BOWSER_ANIMS,
+        .limitAnimations = N(LimitAnims_Bowser),
+    },
+    {
+        .id = NPC_Koopatrol_01,
+        .pos = { 0.0f, -500.0f, 0.0f },
+        .yaw = 0,
+        .init = &N(EVS_NpcInit_Koopatrol_01),
+        .settings = &N(NpcSettings_Koopatrol),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION,
+        .drops = NO_DROPS,
+        .animations = KOOPATROL_ANIMS,
+        .limitAnimations = N(LimitAnims_Koopatrol),
+    },
+    {
+        .id = NPC_Koopatrol_02,
+        .pos = { 0.0f, -500.0f, 0.0f },
+        .yaw = 0,
+        .init = &N(EVS_NpcInit_Koopatrol_02),
+        .settings = &N(NpcSettings_Koopatrol),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION,
+        .drops = NO_DROPS,
+        .animations = KOOPATROL_ANIMS,
+        .limitAnimations = N(LimitAnims_Koopatrol),
+    },
+    {
+        .id = NPC_HammerBros,
+        .pos = { 0.0f, -500.0f, 0.0f },
+        .yaw = 0,
+        .init = &N(EVS_NpcInit_HammerBros),
+        .settings = &N(NpcSettings_HammerBros),
+        .flags = ENEMY_FLAG_PASSIVE | ENEMY_FLAG_DO_NOT_KILL | ENEMY_FLAG_ENABLE_HIT_SCRIPT | ENEMY_FLAG_IGNORE_WORLD_COLLISION | ENEMY_FLAG_IGNORE_PLAYER_COLLISION | ENEMY_FLAG_IGNORE_ENTITY_COLLISION,
+        .drops = NO_DROPS,
+        .animations = HAMMER_BROS_ANIMS,
+        .limitAnimations = N(LimitAnims_HammerBros),
+    },
+};
+
+NpcGroupList N(DefaultNPCs) = {
+    NPC_GROUP(N(NpcData_Characters)),
+    {}
+};
